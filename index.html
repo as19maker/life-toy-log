@@ -1,0 +1,1051 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Life Toy Log | 盒玩扭蛋生活日記</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      -webkit-tap-highlight-color: transparent;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background-color: #F8F9FA;
+    }
+    @keyframes spinLever {
+      0% { transform: rotate(0deg); }
+      50% { transform: rotate(180deg); }
+      100% { transform: rotate(360deg); }
+    }
+    .spin-active {
+      animation: spinLever 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    @keyframes dropBall {
+      0% { transform: translateY(-40px) scale(0.5); opacity: 0; }
+      60% { transform: translateY(10px) scale(1.1); opacity: 1; }
+      80% { transform: translateY(-4px) scale(0.95); }
+      100% { transform: translateY(0) scale(1); opacity: 1; }
+    }
+    .ball-drop {
+      animation: dropBall 0.5s ease-out forwards;
+    }
+    @keyframes popCard {
+      0% { transform: scale(0.85); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    .modal-pop {
+      animation: popCard 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+  </style>
+</head>
+<body class="text-slate-800 antialiased min-h-screen pb-24">
+
+  <!-- Header -->
+  <header class="sticky top-0 z-40 bg-white/95 backdrop-blur border-b border-slate-200">
+    <div class="max-w-3xl mx-auto px-4 h-15 flex items-center justify-between">
+      <div class="flex items-center space-x-2.5">
+        <div class="w-9 h-9 rounded-xl bg-amber-100 flex items-center justify-center text-xl">
+          🐱
+        </div>
+        <div>
+          <div class="flex items-center gap-1.5">
+            <h1 class="text-sm font-extrabold text-slate-900 tracking-tight">LIFE TOY LOG</h1>
+            <span class="text-[10px] font-bold px-1.5 py-0.2 rounded bg-amber-50 text-amber-800 border border-amber-200">扭蛋生活</span>
+          </div>
+          <p class="text-[11px] text-slate-400" id="headerDate">--</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
+        <div class="flex items-center gap-1 bg-amber-50 border border-amber-200 px-2.5 py-1 rounded-full text-xs font-bold text-amber-700">
+          <span>🪙</span>
+          <span id="coinDisplay">0</span>
+        </div>
+        <button onclick="exportToCSV()" title="匯出 CSV" class="p-1.5 text-slate-600 hover:bg-slate-100 rounded-lg text-xs font-medium">
+          匯出
+        </button>
+        <button onclick="openSettingsModal()" title="設定" class="p-1.5 text-slate-600 hover:bg-slate-100 rounded-lg text-sm">
+          ⚙️
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="max-w-3xl mx-auto px-4 py-4 space-y-4">
+
+    <!-- HERO: GACHA MACHINE STAGE -->
+    <section class="bg-gradient-to-b from-white to-amber-50/40 rounded-2xl p-4 border border-amber-200/70 shadow-sm relative overflow-hidden">
+      <div class="flex items-center justify-between gap-4">
+        
+        <!-- Left: Gacha Visual -->
+        <div class="flex items-center gap-3">
+          <div class="w-20 h-24 bg-white rounded-2xl border-2 border-amber-200 shadow-inner flex flex-col items-center justify-between p-2 relative">
+            <!-- Glass Dome with balls -->
+            <div class="w-16 h-12 bg-amber-50/70 rounded-xl flex items-center justify-center gap-1 text-xs border border-amber-100">
+              <span class="transform -translate-y-1">🔴</span>
+              <span class="transform translate-y-1">🟡</span>
+              <span class="transform -translate-y-0.5">🟢</span>
+            </div>
+            <!-- Crank Slot -->
+            <div id="gachaLever" class="w-6 h-6 rounded-full bg-slate-800 text-white flex items-center justify-center text-[10px] shadow cursor-pointer">
+              🌀
+            </div>
+          </div>
+          <div>
+            <div class="flex items-center gap-1.5">
+              <h2 class="text-sm font-bold text-slate-900">生活微縮扭蛋機</h2>
+              <span class="text-[10px] font-semibold text-amber-700 bg-amber-100/70 px-1.5 py-0.2 rounded" id="buffLabel">常態掉落</span>
+            </div>
+            <p class="text-xs text-slate-500 mt-0.5">紀錄飲食(+1🪙)、體態(+1🪙)、運動(+2🪙)</p>
+            <div class="text-[11px] text-slate-400 mt-1">
+              已收集圖鑑：<b class="text-slate-800" id="collectionRatio">0 / 12</b>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Crank Action -->
+        <button onclick="playGacha()" class="px-4 py-3 bg-slate-900 hover:bg-slate-800 active:scale-95 text-white font-bold text-xs rounded-xl shadow transition flex flex-col items-center gap-0.5 shrink-0">
+          <span>扭一次</span>
+          <span class="text-[10px] text-amber-300 font-normal">消耗 1 🪙</span>
+        </button>
+      </div>
+
+      <!-- Quick Metrics Strip -->
+      <div class="grid grid-cols-4 gap-2 text-center text-xs mt-3 pt-3 border-t border-amber-100">
+        <div>
+          <span class="text-[10px] text-slate-400 block">今日熱量</span>
+          <span class="font-bold text-slate-800" id="todayCal">0</span> <span class="text-[9px] text-slate-400">kcal</span>
+        </div>
+        <div>
+          <span class="text-[10px] text-slate-400 block">今日蛋白質</span>
+          <span class="font-bold text-slate-800" id="todayProt">0</span> <span class="text-[9px] text-slate-400">g</span>
+        </div>
+        <div>
+          <span class="text-[10px] text-slate-400 block">今日運動</span>
+          <span class="font-bold text-slate-800" id="todayWorkout">0</span> <span class="text-[9px] text-slate-400">分</span>
+        </div>
+        <div>
+          <span class="text-[10px] text-slate-400 block">最新體態</span>
+          <span class="font-bold text-emerald-600" id="latestWeight">--</span> <span class="text-[9px] text-slate-400">kg</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- NAVIGATION TABS -->
+    <div class="flex items-center space-x-1 border-b border-slate-200">
+      <button onclick="switchTab('meals')" id="tabBtn-meals" class="px-3.5 py-2 text-xs font-bold border-b-2 border-slate-900 text-slate-900 transition">
+        🍽️ 飲食記錄
+      </button>
+      <button onclick="switchTab('workout')" id="tabBtn-workout" class="px-3.5 py-2 text-xs font-medium border-b-2 border-transparent text-slate-500 hover:text-slate-800 transition">
+        🏋️ 運動鍛鍊
+      </button>
+      <button onclick="switchTab('body')" id="tabBtn-body" class="px-3.5 py-2 text-xs font-medium border-b-2 border-transparent text-slate-500 hover:text-slate-800 transition">
+        ⚖️ 體重腰圍
+      </button>
+      <button onclick="switchTab('showcase')" id="tabBtn-showcase" class="px-3.5 py-2 text-xs font-medium border-b-2 border-transparent text-slate-500 hover:text-slate-800 transition">
+        🎁 扭蛋展示架
+      </button>
+    </div>
+
+    <!-- TAB 1: MEALS & NUTRITION -->
+    <div id="tabContent-meals" class="space-y-4">
+      <section class="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-xs">
+        <h3 class="font-bold text-slate-800 text-xs mb-3 flex items-center justify-between">
+          <span>新增一餐</span>
+          <span class="text-[11px] text-amber-600 font-semibold">+1 🪙</span>
+        </h3>
+
+        <form id="mealForm" onsubmit="handleMealSubmit(event)" class="space-y-3">
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="block text-[11px] font-medium text-slate-600 mb-1">餐別</label>
+              <select id="mealType" class="w-full text-xs bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-2">
+                <option value="早餐">早餐</option>
+                <option value="午餐" selected>午餐</option>
+                <option value="晚餐">晚餐</option>
+                <option value="點心">點心 / 補給</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-[11px] font-medium text-slate-600 mb-1">記錄時間</label>
+              <input type="datetime-local" id="mealDateTime" required class="w-full text-xs bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-2">
+            </div>
+          </div>
+
+          <!-- Photo Upload & AI Button -->
+          <div>
+            <label class="block text-[11px] font-medium text-slate-600 mb-1">食物照片 (自動壓縮)</label>
+            <div class="flex items-center gap-2">
+              <label class="flex-1 flex items-center justify-center gap-1.5 border border-dashed border-slate-300 bg-slate-50 rounded-xl px-3 py-2 cursor-pointer text-xs text-slate-600 hover:bg-slate-100">
+                <span>📷</span>
+                <span id="photoLabel">拍照或選擇照片</span>
+                <input type="file" id="mealPhotoInput" accept="image/*" class="hidden" onchange="handlePhotoSelect(event)">
+              </label>
+              <button type="button" id="btnAnalyzeAI" onclick="analyzeFoodWithAI()" class="hidden px-3 py-2 bg-slate-900 text-white rounded-xl text-xs font-semibold">
+                ✨ AI 估算
+              </button>
+            </div>
+            <div id="imagePreviewContainer" class="hidden mt-2 relative inline-block">
+              <img id="imagePreview" src="" alt="預覽" class="w-16 h-16 object-cover rounded-xl border border-slate-200">
+              <button type="button" onclick="clearPhoto()" class="absolute -top-1 -right-1 bg-slate-800 text-white rounded-full w-4 h-4 text-[10px] flex items-center justify-center">✕</button>
+            </div>
+            <div id="aiLoadingStatus" class="hidden text-xs text-amber-700 mt-1.5">Gemini AI 正在分析餐點中...</div>
+          </div>
+
+          <div>
+            <label class="block text-[11px] font-medium text-slate-600 mb-1">內容說明</label>
+            <input type="text" id="mealDescription" placeholder="例如：手沖黑咖啡、脆皮歐包配煎雞胸肉" required class="w-full text-xs bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-2">
+          </div>
+
+          <div class="grid grid-cols-4 gap-2">
+            <div>
+              <label class="block text-[10px] text-slate-500 mb-0.5">熱量(kcal)</label>
+              <input type="number" id="mealCal" placeholder="0" class="w-full text-xs bg-slate-50 border border-slate-200 rounded-xl px-2 py-1.5">
+            </div>
+            <div>
+              <label class="block text-[10px] text-slate-500 mb-0.5">蛋(g)</label>
+              <input type="number" step="0.1" id="mealProt" placeholder="0" class="w-full text-xs bg-slate-50 border border-slate-200 rounded-xl px-2 py-1.5">
+            </div>
+            <div>
+              <label class="block text-[10px] text-slate-500 mb-0.5">碳(g)</label>
+              <input type="number" step="0.1" id="mealCarbs" placeholder="0" class="w-full text-xs bg-slate-50 border border-slate-200 rounded-xl px-2 py-1.5">
+            </div>
+            <div>
+              <label class="block text-[10px] text-slate-500 mb-0.5">脂(g)</label>
+              <input type="number" step="0.1" id="mealFat" placeholder="0" class="w-full text-xs bg-slate-50 border border-slate-200 rounded-xl px-2 py-1.5">
+            </div>
+          </div>
+
+          <button type="submit" class="w-full py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-xl shadow-xs">
+            儲存飲食紀錄
+          </button>
+        </form>
+      </section>
+
+      <!-- History Meals -->
+      <section class="space-y-2">
+        <h4 class="text-xs font-bold text-slate-500 uppercase">歷史餐點紀錄</h4>
+        <div id="mealListContainer" class="space-y-2"></div>
+      </section>
+    </div>
+
+    <!-- TAB 2: WORKOUT -->
+    <div id="tabContent-workout" class="hidden space-y-4">
+      <section class="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-xs">
+        <h3 class="font-bold text-slate-800 text-xs mb-3 flex items-center justify-between">
+          <span>記錄運動鍛鍊</span>
+          <span class="text-[11px] text-amber-600 font-semibold">+2 🪙</span>
+        </h3>
+
+        <form id="workoutForm" onsubmit="handleWorkoutSubmit(event)" class="space-y-3">
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="block text-[11px] font-medium text-slate-600 mb-1">運動類型</label>
+              <select id="workoutType" class="w-full text-xs bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-2">
+                <option value="🏋️ 重訓 / 阻力訓練" selected>🏋️ 重訓 / 阻力訓練</option>
+                <option value="⚡ 功能性團課 / F45">⚡ 功能性團課 / F45</option>
+                <option value="🛹 滑板練習 / 技巧板">🛹 滑板練習 / 技巧板</option>
+                <option value="🚶 走路機 / 散步">🚶 走路機 / 散步</option>
+                <option value="🚲 戶外騎乘 / 通勤">🚲 戶外騎乘 / 通勤</option>
+                <option value="🧘 滾筒放鬆 / 伸展">🧘 滾筒放鬆 / 伸展</option>
+                <option value="🎯 其他運動">🎯 其他運動</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-[11px] font-medium text-slate-600 mb-1">運動日期</label>
+              <input type="date" id="workoutDate" required class="w-full text-xs bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-2">
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="block text-[11px] font-medium text-slate-600 mb-1">時長 (分鐘)</label>
+              <input type="number" id="workoutDuration" placeholder="45" required class="w-full text-xs bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-2">
+            </div>
+            <div>
+              <label class="block text-[11px] font-medium text-slate-600 mb-1">消耗 (kcal，選填)</label>
+              <input type="number" id="workoutCal" placeholder="250" class="w-full text-xs bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-2">
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-[11px] font-medium text-slate-600 mb-1">訓練內容 / 備註心得</label>
+            <input type="text" id="workoutNotes" placeholder="例如：深蹲 4 組、分腿蹲；核心感受佳" class="w-full text-xs bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-2">
+          </div>
+
+          <button type="submit" class="w-full py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-xl shadow-xs">
+            儲存運動紀錄
+          </button>
+        </form>
+      </section>
+
+      <!-- Workout History -->
+      <section class="space-y-2">
+        <h4 class="text-xs font-bold text-slate-500 uppercase">近期運動紀錄</h4>
+        <div id="workoutListContainer" class="space-y-2"></div>
+      </section>
+    </div>
+
+    <!-- TAB 3: BODY METRICS -->
+    <div id="tabContent-body" class="hidden space-y-4">
+      <section class="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-xs">
+        <h3 class="font-bold text-slate-800 text-xs mb-3 flex items-center justify-between">
+          <span>今日體態打卡</span>
+          <span class="text-[11px] text-amber-600 font-semibold">+1 🪙</span>
+        </h3>
+
+        <form id="bodyForm" onsubmit="handleBodySubmit(event)" class="grid grid-cols-3 gap-2 items-end">
+          <div>
+            <label class="block text-[11px] font-medium text-slate-600 mb-1">打卡日期</label>
+            <input type="date" id="bodyDate" required class="w-full text-xs bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-2">
+          </div>
+          <div>
+            <label class="block text-[11px] font-medium text-slate-600 mb-1">體重 (kg)</label>
+            <input type="number" step="0.1" id="bodyWeight" placeholder="75.0" required class="w-full text-xs bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-2">
+          </div>
+          <div>
+            <label class="block text-[11px] font-medium text-slate-600 mb-1">腰圍 (cm)</label>
+            <input type="number" step="0.1" id="bodyWaist" placeholder="82.0" class="w-full text-xs bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-2">
+          </div>
+          <div class="col-span-3 mt-1">
+            <button type="submit" class="w-full py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-xl shadow-xs">
+              儲存體態紀錄
+            </button>
+          </div>
+        </form>
+      </section>
+
+      <!-- Chart -->
+      <section class="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-xs">
+        <h4 class="font-bold text-slate-800 text-xs mb-2">體態雙軸趨勢圖 (最近 30 筆)</h4>
+        <div class="h-56 w-full">
+          <canvas id="bodyMetricsChart"></canvas>
+        </div>
+      </section>
+
+      <!-- Table -->
+      <section class="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-xs">
+        <h4 class="font-bold text-slate-800 text-xs uppercase mb-2">歷史打卡</h4>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs text-slate-600">
+            <thead class="bg-slate-50 text-slate-500 uppercase border-b border-slate-100">
+              <tr>
+                <th class="py-2 px-2.5">日期</th>
+                <th class="py-2 px-2.5">體重 (kg)</th>
+                <th class="py-2 px-2.5">腰圍 (cm)</th>
+                <th class="py-2 px-2.5 text-right">刪除</th>
+              </tr>
+            </thead>
+            <tbody id="bodyLogTableBody" class="divide-y divide-slate-100"></tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+
+    <!-- TAB 4: GACHA SHOWCASE GALLERY -->
+    <div id="tabContent-showcase" class="hidden space-y-4">
+      <section class="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-xs">
+        <div class="flex items-center justify-between mb-3">
+          <div>
+            <h3 class="font-bold text-slate-800 text-sm">我的生活扭蛋展示架</h3>
+            <p class="text-xs text-slate-400">抽到收藏物會放入展示格，空格等待解鎖！</p>
+          </div>
+          <span class="text-xs font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200" id="showcaseCountBadge">
+            0 / 12
+          </span>
+        </div>
+
+        <div id="showcaseGrid" class="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+          <!-- Injected via JS -->
+        </div>
+      </section>
+    </div>
+
+  </main>
+
+  <!-- GACHA MODAL -->
+  <div id="gachaModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-sm w-full p-6 text-center shadow-2xl border border-slate-100 modal-pop space-y-3">
+      <div id="gachaRevealIcon" class="w-16 h-16 mx-auto rounded-2xl bg-amber-50 flex items-center justify-center text-3xl shadow-inner">
+        📦
+      </div>
+      <div>
+        <span id="gachaRarityTag" class="text-[10px] uppercase font-bold text-amber-800 bg-amber-100/70 px-2 py-0.5 rounded-full border border-amber-200">
+          普通款
+        </span>
+        <h3 id="gachaCardTitle" class="text-base font-extrabold text-slate-900 mt-2">
+          扭蛋結果
+        </h3>
+        <p id="gachaCardQuote" class="text-xs text-slate-500 mt-1 italic leading-relaxed">
+          「……」
+        </p>
+      </div>
+
+      <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 text-left text-xs space-y-1">
+        <div class="flex justify-between">
+          <span class="text-slate-400">類別</span>
+          <span class="font-semibold text-slate-700" id="gachaCategory">生活微縮</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-slate-400">狀態</span>
+          <span class="font-semibold text-emerald-600" id="gachaStatus">放入展示架</span>
+        </div>
+      </div>
+
+      <button onclick="closeGachaModal()" class="w-full py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-xl shadow-xs">
+        收到
+      </button>
+    </div>
+  </div>
+
+  <!-- SETTINGS MODAL -->
+  <div id="settingsModal" class="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-sm w-full p-5 shadow-xl border border-slate-100 space-y-3">
+      <div class="flex items-center justify-between">
+        <h3 class="font-bold text-slate-900 text-sm">個人設定</h3>
+        <button onclick="closeSettingsModal()" class="text-slate-400 hover:text-slate-600">✕</button>
+      </div>
+
+      <div class="space-y-2.5">
+        <div>
+          <label class="block text-[11px] font-semibold text-slate-700 mb-0.5">Gemini API Key (拍照辨識選填)</label>
+          <input type="password" id="settingApiKey" placeholder="AIzaSy..." class="w-full text-xs bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-2">
+        </div>
+        <div>
+          <label class="block text-[11px] font-semibold text-slate-700 mb-0.5">每日熱量目標 (kcal)</label>
+          <input type="number" id="settingCalTarget" value="1800" class="w-full text-xs bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-2">
+        </div>
+        <div>
+          <label class="block text-[11px] font-semibold text-slate-700 mb-0.5">每日蛋白質目標 (g)</label>
+          <input type="number" id="settingProtTarget" value="100" class="w-full text-xs bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-2">
+        </div>
+
+        <div class="pt-2 border-t border-slate-100 flex gap-2">
+          <button type="button" onclick="exportBackupJSON()" class="flex-1 py-1.5 text-[11px] border border-slate-200 rounded-xl text-slate-700">
+            匯出 JSON 備份
+          </button>
+          <label class="flex-1 py-1.5 text-[11px] border border-slate-200 rounded-xl text-slate-700 text-center cursor-pointer">
+            匯入備份
+            <input type="file" accept=".json" class="hidden" onchange="importBackupJSON(event)">
+          </label>
+        </div>
+      </div>
+
+      <div class="flex justify-end gap-2 pt-2">
+        <button onclick="closeSettingsModal()" class="px-3 py-1.5 text-xs text-slate-500">取消</button>
+        <button onclick="saveSettings()" class="px-3.5 py-1.5 text-xs font-bold bg-slate-900 text-white rounded-xl">儲存</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // --- STORAGE KEYS ---
+    const KEY_MEALS = 'toy_log_meals_v2';
+    const KEY_BODY = 'toy_log_body_v2';
+    const KEY_WORKOUTS = 'toy_log_workouts_v2';
+    const KEY_SETTINGS = 'toy_log_settings_v2';
+    const KEY_SHOWCASE = 'toy_log_showcase_v1';
+
+    // 12 Collectible items for the Showcase Gallery
+    const COLLECTIBLE_ITEMS = [
+      { id: 'item_1', name: '手沖黑金壺', icon: '☕', category: '生活道具', rarity: '稀有', quote: '慢慢滴濾，代謝跟生活都需要一點萃取時間。' },
+      { id: 'item_2', name: '剛出爐脆皮歐包', icon: '🥖', category: '生活道具', rarity: '普通', quote: '優質碳水是肌肉的柴火，吃得心安理得。' },
+      { id: 'item_3', name: '技術滑板與軟輪', icon: '🛹', category: '生活道具', rarity: '稀有', quote: '重心放低，即使今天稍微晃了一下，也沒摔倒。' },
+      { id: 'item_4', name: '深蹲護腕', icon: '🏋️', category: '生活道具', rarity: '普通', quote: '今天核心收得很緊，推蹬感受度扎實。' },
+      { id: 'item_5', name: '室內走路機踏板', icon: '🚶', category: '生活道具', rarity: '普通', quote: '邊看影片邊走個幾千步，微小的事情會聚沙成塔。' },
+      { id: 'item_6', name: '紙箱溢出貓', icon: '📦', category: '貓咪日常', rarity: '稀有', quote: '不管箱子多小，肉肉溢出來了也是舒服的。' },
+      { id: 'item_7', name: '清晨踩肚肉爪', icon: '🐾', category: '貓咪日常', rarity: '普通', quote: '天然定時鬧鐘，準時在肚皮上踏踏催開飯。' },
+      { id: 'item_8', name: '滿載貓毛黏黏滾筒', icon: '🧹', category: '貓咪日常', rarity: '普通', quote: '黑色衣服是貓奴的禁忌，但我們早已妥協。' },
+      { id: 'item_9', name: '黑金限定生活公仔', icon: '🧸', category: '隱藏限定', rarity: '傳奇', quote: '同一套衣服穿出全新鬆弛感，步調在自己手裡。' },
+      { id: 'item_10', name: '純金蛋白質達標金牌', icon: '🥇', category: '隱藏限定', rarity: '傳奇', quote: '今天蛋白質完全吃夠，修復與代謝都在發光。' },
+      { id: 'item_11', name: '冷萃咖啡微縮杯', icon: '🧊', category: '生活道具', rarity: '普通', quote: '冰涼醇厚，午後提神無負擔的純粹快樂。' },
+      { id: 'item_12', name: '曬太陽放空貓', icon: '☀️', category: '貓咪日常', rarity: '稀有', quote: '偶爾無所事事地攤平，也是很重要的生理修復。' }
+    ];
+
+    // Funny Empty Shells / Consolation Notes (銘謝惠顧 / 幽默字條，不佔格子)
+    const DUMMY_NOTES = [
+      { name: '空白籤詩', icon: '📜', quote: '蛋殼裡只有一張紙條：『今天水喝夠 2000cc 了嗎？』' },
+      { name: '斷掉的皮尺', icon: '📏', quote: '今天腰圍多了一公分？一定是皮尺被拉鬆了，明天再量。' },
+      { name: '微繃的鈕扣', icon: '🔘', quote: '最下面這顆釦子今天已經盡力了，晚上放它一馬。' },
+      { name: '空的歐包紙袋', icon: '🥐', quote: '熱量已經轉化為肌肉能量，只留下香氣記憶。' },
+      { name: '掉落的貓鬍鬚', icon: '🌾', quote: '傳說撿到貓鬍鬚會帶來幸運，明天繼續打卡試試手氣！' }
+    ];
+
+    // Data State
+    let meals = JSON.parse(localStorage.getItem(KEY_MEALS) || '[]');
+    let bodyLogs = JSON.parse(localStorage.getItem(KEY_BODY) || '[]');
+    let workouts = JSON.parse(localStorage.getItem(KEY_WORKOUTS) || '[]');
+    let showcase = JSON.parse(localStorage.getItem(KEY_SHOWCASE) || JSON.stringify(['item_1', 'item_7']));
+    let settings = JSON.parse(localStorage.getItem(KEY_SETTINGS) || JSON.stringify({
+      coins: 5,
+      calTarget: 1800,
+      protTarget: 100,
+      geminiKey: ''
+    }));
+
+    let currentPhotoBase64 = null;
+    let chartInstance = null;
+
+    // Initialization
+    document.addEventListener('DOMContentLoaded', () => {
+      initDateInputs();
+      renderDashboard();
+      renderMealList();
+      renderWorkoutList();
+      renderBodyTable();
+      renderShowcase();
+      initChart();
+    });
+
+    function initDateInputs() {
+      const now = new Date();
+      const tzOffset = now.getTimezoneOffset() * 60000;
+      const localISOTime = (new Date(Date.now() - tzOffset)).toISOString().slice(0, 16);
+      const localISODate = (new Date(Date.now() - tzOffset)).toISOString().slice(0, 10);
+
+      document.getElementById('mealDateTime').value = localISOTime;
+      document.getElementById('bodyDate').value = localISODate;
+      document.getElementById('workoutDate').value = localISODate;
+
+      document.getElementById('headerDate').innerText = now.toLocaleDateString('zh-TW', { month: 'numeric', day: 'numeric', weekday: 'short' });
+      document.getElementById('coinDisplay').innerText = settings.coins || 0;
+    }
+
+    // --- TAB SWITCHER ---
+    function switchTab(tab) {
+      ['meals', 'workout', 'body', 'showcase'].forEach(t => {
+        const content = document.getElementById(`tabContent-${t}`);
+        const btn = document.getElementById(`tabBtn-${t}`);
+        if (t === tab) {
+          content.classList.remove('hidden');
+          btn.className = 'px-3.5 py-2 text-xs font-bold border-b-2 border-slate-900 text-slate-900 transition';
+        } else {
+          content.classList.add('hidden');
+          btn.className = 'px-3.5 py-2 text-xs font-medium border-b-2 border-transparent text-slate-500 hover:text-slate-800 transition';
+        }
+      });
+      if (tab === 'body') updateChart();
+    }
+
+    // --- GACHA CORE (VARIABLE RATIO SCHEDULE) ---
+    function playGacha() {
+      if ((settings.coins || 0) < 1) {
+        alert('🪙 扭蛋幣不足！記錄一次飲食 (+1🪙)、體態打卡 (+1🪙) 或運動 (+2🪙) 賺取扭蛋幣吧！');
+        return;
+      }
+
+      // Deduct coin
+      addCoins(-1);
+
+      // Crank lever animation
+      const lever = document.getElementById('gachaLever');
+      lever.classList.add('spin-active');
+      setTimeout(() => lever.classList.remove('spin-active'), 600);
+
+      // Determine lucky buff today (if workout done or protein >= 80g)
+      const todayPrefix = new Date().toISOString().slice(0, 10);
+      const todayMeals = meals.filter(m => (m.datetime || '').startsWith(todayPrefix));
+      const todayProt = todayMeals.reduce((acc, m) => acc + (m.protein || 0), 0);
+      const todayHasWorkout = workouts.some(w => w.date === todayPrefix);
+      const isBuffed = (todayProt >= 80) || todayHasWorkout;
+
+      // Drop Probabilities:
+      // Normal: 40% empty shell, 60% real item
+      // Buffed: 20% empty shell, 80% real item
+      const emptyChance = isBuffed ? 0.20 : 0.40;
+      const roll = Math.random();
+
+      let result = null;
+      let isItem = false;
+
+      if (roll < emptyChance) {
+        // Drop an empty shell / funny note
+        result = DUMMY_NOTES[Math.floor(Math.random() * DUMMY_NOTES.length)];
+        isItem = false;
+      } else {
+        // Drop a real collectible item
+        result = COLLECTIBLE_ITEMS[Math.floor(Math.random() * COLLECTIBLE_ITEMS.length)];
+        isItem = true;
+        if (!showcase.includes(result.id)) {
+          showcase.push(result.id);
+          localStorage.setItem(KEY_SHOWCASE, JSON.stringify(showcase));
+          renderShowcase();
+        }
+      }
+
+      // Show Gacha Result in Modal
+      document.getElementById('gachaRevealIcon').innerText = result.icon;
+      document.getElementById('gachaCardTitle').innerText = result.name;
+      document.getElementById('gachaCardQuote').innerText = `「${result.quote}」`;
+      document.getElementById('gachaRarityTag').innerText = isItem ? result.rarity : '幽默小籤';
+      document.getElementById('gachaRarityTag').className = isItem && result.rarity === '傳奇' ? 
+        'text-[10px] uppercase font-bold text-amber-900 bg-amber-300 px-2 py-0.5 rounded-full shadow-xs' : 
+        'text-[10px] uppercase font-bold text-amber-800 bg-amber-100/70 px-2 py-0.5 rounded-full border border-amber-200';
+      document.getElementById('gachaCategory').innerText = isItem ? result.category : '安慰獎';
+      document.getElementById('gachaStatus').innerText = isItem ? '已收進展示架' : '微笑放過自己';
+
+      document.getElementById('gachaModal').classList.remove('hidden');
+    }
+
+    function closeGachaModal() {
+      document.getElementById('gachaModal').classList.add('hidden');
+    }
+
+    function renderShowcase() {
+      const container = document.getElementById('showcaseGrid');
+      const ratio = `${showcase.length} / ${COLLECTIBLE_ITEMS.length}`;
+      document.getElementById('collectionRatio').innerText = ratio;
+      document.getElementById('showcaseCountBadge').innerText = ratio;
+
+      container.innerHTML = COLLECTIBLE_ITEMS.map(item => {
+        const unlocked = showcase.includes(item.id);
+        return `
+          <div class="p-3 rounded-2xl border ${unlocked ? 'bg-white border-amber-200 shadow-2xs' : 'bg-slate-100/60 border-slate-200/50 opacity-50'} flex flex-col justify-between min-h-[96px]">
+            <div>
+              <div class="text-2xl mb-1">${unlocked ? item.icon : '❓'}</div>
+              <h5 class="font-bold text-xs ${unlocked ? 'text-slate-800' : 'text-slate-400'}">${unlocked ? item.name : '未解鎖'}</h5>
+              <p class="text-[10px] text-slate-500 mt-0.5 line-clamp-2">${unlocked ? item.quote : '轉動扭蛋機試試手氣'}</p>
+            </div>
+            <div class="mt-2 pt-1 border-t border-slate-100 flex justify-between text-[9px] text-slate-400">
+              <span>${item.category}</span>
+              <span class="font-semibold text-amber-600">${unlocked ? item.rarity : '???'}</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // --- COIN REWARDS ---
+    function addCoins(amount) {
+      settings.coins = (settings.coins || 0) + amount;
+      localStorage.setItem(KEY_SETTINGS, JSON.stringify(settings));
+      document.getElementById('coinDisplay').innerText = settings.coins;
+    }
+
+    // --- MEALS HANDLING ---
+    function handlePhotoSelect(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const img = new Image();
+        img.onload = () => {
+          const maxDim = 800;
+          let w = img.width, h = img.height;
+          if (w > h && w > maxDim) { h = Math.round((h * maxDim) / w); w = maxDim; }
+          else if (h > maxDim) { w = Math.round((w * maxDim) / h); h = maxDim; }
+          const canvas = document.createElement('canvas');
+          canvas.width = w; canvas.height = h;
+          canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+          currentPhotoBase64 = canvas.toDataURL('image/jpeg', 0.7);
+
+          document.getElementById('imagePreview').src = currentPhotoBase64;
+          document.getElementById('imagePreviewContainer').classList.remove('hidden');
+          document.getElementById('photoLabel').innerText = "已選取照片";
+          if (settings.geminiKey) document.getElementById('btnAnalyzeAI').classList.remove('hidden');
+        };
+        img.src = event.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function clearPhoto() {
+      currentPhotoBase64 = null;
+      document.getElementById('mealPhotoInput').value = '';
+      document.getElementById('imagePreviewContainer').classList.add('hidden');
+      document.getElementById('btnAnalyzeAI').classList.add('hidden');
+      document.getElementById('photoLabel').innerText = "拍照或選擇照片";
+    }
+
+    async function analyzeFoodWithAI() {
+      if (!settings.geminiKey) {
+        alert('請先點擊右上角 ⚙️ 設定並填入 Gemini API Key！');
+        openSettingsModal();
+        return;
+      }
+      if (!currentPhotoBase64) return;
+      const statusEl = document.getElementById('aiLoadingStatus');
+      statusEl.classList.remove('hidden');
+
+      try {
+        const base64Data = currentPhotoBase64.split(',')[1];
+        const prompt = "請扮演專業營養師。分析此餐點照片，估算其餐點名稱與營養素。請務必只回傳標準 JSON 格式，JSON 格式如下：\n" +
+          '{"name": "餐點名稱", "calories": 450, "protein": 28, "carbs": 35, "fat": 15}';
+
+        const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${settings.geminiKey}`;
+        const response = await fetch(endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{
+              parts: [{ text: prompt }, { inline_data: { mime_type: "image/jpeg", data: base64Data } }]
+            }]
+          })
+        });
+
+        const resData = await response.json();
+        if (resData.candidates && resData.candidates[0].content.parts[0].text) {
+          let text = resData.candidates[0].content.parts[0].text.trim().replace(/```json/g, '').replace(/```/g, '').trim();
+          const parsed = JSON.parse(text);
+          if (parsed.name) document.getElementById('mealDescription').value = parsed.name;
+          if (parsed.calories) document.getElementById('mealCal').value = parsed.calories;
+          if (parsed.protein) document.getElementById('mealProt').value = parsed.protein;
+          if (parsed.carbs) document.getElementById('mealCarbs').value = parsed.carbs;
+          if (parsed.fat) document.getElementById('mealFat').value = parsed.fat;
+        }
+      } catch (err) {
+        alert('AI 分析失敗：' + err.message);
+      } finally {
+        statusEl.classList.add('hidden');
+      }
+    }
+
+    function handleMealSubmit(e) {
+      e.preventDefault();
+      const meal = {
+        id: 'meal_' + Date.now(),
+        type: document.getElementById('mealType').value,
+        datetime: document.getElementById('mealDateTime').value,
+        desc: document.getElementById('mealDescription').value.trim(),
+        calories: parseFloat(document.getElementById('mealCal').value) || 0,
+        protein: parseFloat(document.getElementById('mealProt').value) || 0,
+        carbs: parseFloat(document.getElementById('mealCarbs').value) || 0,
+        fat: parseFloat(document.getElementById('mealFat').value) || 0,
+        photo: currentPhotoBase64
+      };
+
+      meals.unshift(meal);
+      localStorage.setItem(KEY_MEALS, JSON.stringify(meals));
+      addCoins(1);
+
+      document.getElementById('mealForm').reset();
+      clearPhoto();
+      initDateInputs();
+      renderDashboard();
+      renderMealList();
+    }
+
+    function deleteMeal(id) {
+      if (!confirm('確定刪除這筆飲食？')) return;
+      meals = meals.filter(m => m.id !== id);
+      localStorage.setItem(KEY_MEALS, JSON.stringify(meals));
+      renderDashboard();
+      renderMealList();
+    }
+
+    function renderMealList() {
+      const container = document.getElementById('mealListContainer');
+      if (meals.length === 0) {
+        container.innerHTML = `<div class="p-4 bg-white rounded-xl text-center text-slate-400 text-xs border border-slate-100">尚無餐點紀錄，拍張照或記錄今天的第一餐吧！</div>`;
+        return;
+      }
+      container.innerHTML = meals.map(m => `
+        <div class="bg-white p-3 rounded-xl border border-slate-200/80 shadow-2xs flex items-start gap-3">
+          ${m.photo ? `<img src="${m.photo}" class="w-14 h-14 rounded-lg object-cover border border-slate-100 shrink-0">` : ''}
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] font-bold px-1.5 py-0.2 rounded bg-slate-100 text-slate-700">${m.type}</span>
+              <span class="text-[10px] text-slate-400">${(m.datetime || '').replace('T', ' ')}</span>
+            </div>
+            <h5 class="text-xs font-bold text-slate-800 mt-1 truncate">${m.desc}</h5>
+            <div class="flex flex-wrap gap-2 text-[11px] text-slate-500 mt-1">
+              <span>🔥 <b>${m.calories}</b> kcal</span>
+              <span>🍗 蛋: <b>${m.protein}</b>g</span>
+              <span>🍚 碳: <b>${m.carbs}</b>g</span>
+              <span>🥑 脂: <b>${m.fat}</b>g</span>
+            </div>
+          </div>
+          <button onclick="deleteMeal('${m.id}')" class="text-slate-300 hover:text-rose-500 text-xs p-1">✕</button>
+        </div>
+      `).join('');
+    }
+
+    // --- WORKOUT HANDLING ---
+    function handleWorkoutSubmit(e) {
+      e.preventDefault();
+      const item = {
+        id: 'workout_' + Date.now(),
+        type: document.getElementById('workoutType').value,
+        date: document.getElementById('workoutDate').value,
+        duration: parseInt(document.getElementById('workoutDuration').value) || 0,
+        cal: parseInt(document.getElementById('workoutCal').value) || 0,
+        notes: document.getElementById('workoutNotes').value.trim()
+      };
+
+      workouts.unshift(item);
+      localStorage.setItem(KEY_WORKOUTS, JSON.stringify(workouts));
+      addCoins(2);
+
+      document.getElementById('workoutForm').reset();
+      initDateInputs();
+      renderDashboard();
+      renderWorkoutList();
+    }
+
+    function deleteWorkout(id) {
+      if (!confirm('確定刪除這筆運動紀錄？')) return;
+      workouts = workouts.filter(w => w.id !== id);
+      localStorage.setItem(KEY_WORKOUTS, JSON.stringify(workouts));
+      renderDashboard();
+      renderWorkoutList();
+    }
+
+    function renderWorkoutList() {
+      const container = document.getElementById('workoutListContainer');
+      if (workouts.length === 0) {
+        container.innerHTML = `<div class="p-4 bg-white rounded-xl text-center text-slate-400 text-xs border border-slate-100">尚無運動紀錄，出門動一動或在走路機散散步吧！</div>`;
+        return;
+      }
+      container.innerHTML = workouts.map(w => `
+        <div class="bg-white p-3 rounded-xl border border-slate-200/80 shadow-2xs flex items-center justify-between">
+          <div>
+            <div class="flex items-center gap-1.5">
+              <span class="text-xs font-bold text-slate-800">${w.type}</span>
+              <span class="text-[10px] text-slate-400">${w.date}</span>
+            </div>
+            <div class="flex items-center gap-3 text-[11px] text-slate-500 mt-1">
+              <span>⏱️ 時長: <b class="text-slate-700">${w.duration}</b> 分鐘</span>
+              ${w.cal ? `<span>🔥 消耗: <b class="text-slate-700">${w.cal}</b> kcal</span>` : ''}
+              ${w.notes ? `<span class="text-slate-400 truncate max-w-xs">📝 ${w.notes}</span>` : ''}
+            </div>
+          </div>
+          <button onclick="deleteWorkout('${w.id}')" class="text-slate-300 hover:text-rose-500 text-xs p-1">✕</button>
+        </div>
+      `).join('');
+    }
+
+    // --- BODY & WAIST HANDLING ---
+    function handleBodySubmit(e) {
+      e.preventDefault();
+      const dateVal = document.getElementById('bodyDate').value;
+      const weightVal = parseFloat(document.getElementById('bodyWeight').value);
+      const waistVal = parseFloat(document.getElementById('bodyWaist').value) || null;
+      if (!dateVal || isNaN(weightVal)) return;
+
+      const idx = bodyLogs.findIndex(b => b.date === dateVal);
+      if (idx >= 0) {
+        bodyLogs[idx].weight = weightVal;
+        bodyLogs[idx].waist = waistVal;
+      } else {
+        bodyLogs.push({ date: dateVal, weight: weightVal, waist: waistVal });
+      }
+
+      bodyLogs.sort((a, b) => new Date(a.date) - new Date(b.date));
+      localStorage.setItem(KEY_BODY, JSON.stringify(bodyLogs));
+      addCoins(1);
+
+      document.getElementById('bodyWeight').value = '';
+      document.getElementById('bodyWaist').value = '';
+
+      renderDashboard();
+      renderBodyTable();
+      updateChart();
+    }
+
+    function deleteBodyLog(date) {
+      if (!confirm(`確定刪除 ${date} 的打卡？`)) return;
+      bodyLogs = bodyLogs.filter(b => b.date !== date);
+      localStorage.setItem(KEY_BODY, JSON.stringify(bodyLogs));
+      renderDashboard();
+      renderBodyTable();
+      updateChart();
+    }
+
+    function renderBodyTable() {
+      const tbody = document.getElementById('bodyLogTableBody');
+      if (bodyLogs.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="4" class="py-4 text-center text-slate-400">尚無打卡紀錄</td></tr>`;
+        return;
+      }
+      tbody.innerHTML = [...bodyLogs].reverse().map(b => `
+        <tr class="hover:bg-slate-50 transition">
+          <td class="py-2 px-2.5 font-medium text-slate-800">${b.date}</td>
+          <td class="py-2 px-2.5 font-bold text-slate-900">${b.weight} kg</td>
+          <td class="py-2 px-2.5 text-slate-600">${b.waist ? b.waist + ' cm' : '--'}</td>
+          <td class="py-2 px-2.5 text-right">
+            <button onclick="deleteBodyLog('${b.date}')" class="text-slate-300 hover:text-rose-500 text-xs">✕</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    // --- CHART.JS DUAL AXIS ---
+    function initChart() {
+      const ctx = document.getElementById('bodyMetricsChart').getContext('2d');
+      const recent = bodyLogs.slice(-30);
+
+      chartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: recent.map(b => b.date.slice(5)),
+          datasets: [
+            {
+              label: '體重 (kg)',
+              data: recent.map(b => b.weight),
+              borderColor: '#10B981',
+              backgroundColor: 'rgba(16, 185, 129, 0.08)',
+              borderWidth: 2,
+              tension: 0.3,
+              fill: true,
+              yAxisID: 'y'
+            },
+            {
+              label: '腰圍 (cm)',
+              data: recent.map(b => b.waist),
+              borderColor: '#F59E0B',
+              backgroundColor: 'transparent',
+              borderWidth: 2,
+              borderDash: [3, 3],
+              tension: 0.3,
+              yAxisID: 'y1'
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: { mode: 'index', intersect: false },
+          scales: {
+            y: {
+              type: 'linear',
+              display: true,
+              position: 'left',
+              title: { display: true, text: 'kg' }
+            },
+            y1: {
+              type: 'linear',
+              display: true,
+              position: 'right',
+              title: { display: true, text: 'cm' },
+              grid: { drawOnChartArea: false }
+            }
+          }
+        }
+      });
+    }
+
+    function updateChart() {
+      if (!chartInstance) { initChart(); return; }
+      const recent = bodyLogs.slice(-30);
+      chartInstance.data.labels = recent.map(b => b.date.slice(5));
+      chartInstance.data.datasets[0].data = recent.map(b => b.weight);
+      chartInstance.data.datasets[1].data = recent.map(b => b.waist);
+      chartInstance.update();
+    }
+
+    // --- DASHBOARD METRICS ---
+    function renderDashboard() {
+      const todayPrefix = new Date().toISOString().slice(0, 10);
+      const todayMeals = meals.filter(m => (m.datetime || '').startsWith(todayPrefix));
+      const totalCal = Math.round(todayMeals.reduce((acc, m) => acc + (m.calories || 0), 0));
+      const totalProt = Math.round(todayMeals.reduce((acc, m) => acc + (m.protein || 0), 0) * 10) / 10;
+
+      const todayWorkouts = workouts.filter(w => w.date === todayPrefix);
+      const totalWorkoutMins = todayWorkouts.reduce((acc, w) => acc + (w.duration || 0), 0);
+
+      const latestBody = bodyLogs[bodyLogs.length - 1];
+
+      document.getElementById('todayCal').innerText = totalCal;
+      document.getElementById('todayProt').innerText = totalProt;
+      document.getElementById('todayWorkout').innerText = totalWorkoutMins;
+      document.getElementById('latestWeight').innerText = latestBody ? latestBody.weight : '--';
+
+      // Update lucky buff badge
+      const isBuffed = (totalProt >= 80) || (totalWorkoutMins > 0);
+      const buffEl = document.getElementById('buffLabel');
+      if (isBuffed) {
+        buffEl.innerText = '⚡ 幸運機率提升中';
+        buffEl.className = 'text-[10px] font-bold text-emerald-800 bg-emerald-100 px-1.5 py-0.2 rounded border border-emerald-300';
+      } else {
+        buffEl.innerText = '常態掉落';
+        buffEl.className = 'text-[10px] font-semibold text-amber-700 bg-amber-100/70 px-1.5 py-0.2 rounded';
+      }
+    }
+
+    // --- SETTINGS MODAL ---
+    function openSettingsModal() {
+      document.getElementById('settingCalTarget').value = settings.calTarget || 1800;
+      document.getElementById('settingProtTarget').value = settings.protTarget || 100;
+      document.getElementById('settingApiKey').value = settings.geminiKey || '';
+      document.getElementById('settingsModal').classList.remove('hidden');
+    }
+
+    function closeSettingsModal() {
+      document.getElementById('settingsModal').classList.add('hidden');
+    }
+
+    function saveSettings() {
+      settings.calTarget = parseInt(document.getElementById('settingCalTarget').value) || 1800;
+      settings.protTarget = parseInt(document.getElementById('settingProtTarget').value) || 100;
+      settings.geminiKey = document.getElementById('settingApiKey').value.trim();
+      localStorage.setItem(KEY_SETTINGS, JSON.stringify(settings));
+
+      closeSettingsModal();
+      renderDashboard();
+      alert('設定已儲存！');
+    }
+
+    // --- EXPORT CSV & BACKUP ---
+    function exportToCSV() {
+      let csv = "\uFEFF"; // UTF-8 BOM
+      csv += "類別,日期時間,名稱/動作項目,數值1(kcal/時長),數值2(蛋白質/腰圍),備註\n";
+
+      meals.forEach(m => {
+        csv += `飲食,${m.datetime || ''},"${(m.desc || '').replace(/"/g, '""')}",${m.calories || 0} kcal,${m.protein || 0} g,"碳水:${m.carbs}g 脂肪:${m.fat}g"\n`;
+      });
+      workouts.forEach(w => {
+        csv += `運動,${w.date},${w.type},${w.duration} 分鐘,${w.cal || 0} kcal,"${(w.notes || '').replace(/"/g, '""')}"\n`;
+      });
+      bodyLogs.forEach(b => {
+        csv += `體態,${b.date},體重 ${b.weight} kg,-,腰圍 ${b.waist || '-'} cm,-\n`;
+      });
+
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `life_toy_log_${new Date().toISOString().slice(0, 10)}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
+
+    function exportBackupJSON() {
+      const data = { meals, workouts, bodyLogs, settings, showcase };
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `life_toy_backup_${new Date().toISOString().slice(0, 10)}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
+
+    function importBackupJSON(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const d = JSON.parse(e.target.result);
+          if (d.meals) meals = d.meals;
+          if (d.workouts) workouts = d.workouts;
+          if (d.bodyLogs) bodyLogs = d.bodyLogs;
+          if (d.settings) settings = d.settings;
+          if (d.showcase) showcase = d.showcase;
+          localStorage.setItem(KEY_MEALS, JSON.stringify(meals));
+          localStorage.setItem(KEY_WORKOUTS, JSON.stringify(workouts));
+          localStorage.setItem(KEY_BODY, JSON.stringify(bodyLogs));
+          localStorage.setItem(KEY_SETTINGS, JSON.stringify(settings));
+          localStorage.setItem(KEY_SHOWCASE, JSON.stringify(showcase));
+          location.reload();
+        } catch (err) {
+          alert('備份解析失敗，請確認檔案格式。');
+        }
+      };
+      reader.readAsText(file);
+    }
+  </script>
+</body>
+</html>
