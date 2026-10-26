@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="googlebot" content="noindex, nofollow">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Life Toy Log | 盒玩扭蛋生活日記</title>
@@ -139,7 +141,7 @@
   </style>
 </head>
 <body class="text-slate-800 antialiased min-h-screen pb-24">
-  <canvas id="confettiCanvas"></canvas>
+  
 
   <!-- Header -->
   <header class="sticky top-0 z-40 bg-white/95 backdrop-blur border-b border-slate-200">
@@ -695,10 +697,8 @@
       initDateInputs();
       renderDashboard();
       const latestP = meals.filter(m => (m.datetime || '').startsWith(todayStr)).reduce((a,m)=>a+(m.protein||0), 0);
-      if (latestP >= (settings.protTarget || 100)) triggerEarthConfetti();
       renderMealList();
       renderWorkoutList();
-      triggerEarthConfetti();
       renderBodyTable();
       renderShowcase();
       initChart();
@@ -733,7 +733,6 @@
         }
       });
       if (tab === 'body') updateChart();
-      triggerEarthConfetti();
     }
 
     // --- GACHA CORE (ANIMATED & REBALANCED) ---
@@ -823,7 +822,6 @@
           showcase.push(result.id);
           localStorage.setItem(KEY_SHOWCASE, JSON.stringify(showcase));
           renderShowcase(result.id); // pass newly unlocked id for shimmer
-          triggerEarthConfetti(); // Paper confetti on new unlock!
         }
       }
 
@@ -905,64 +903,7 @@
     }
 
     // --- 3. EARTH-TONE CONFETTI BURST ---
-    function triggerEarthConfetti() {
-      const canvas = document.getElementById('confettiCanvas');
-      if (!canvas) return;
-      const ctx = canvas.getContext('2d');
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-
-      const colors = ['#A3B18A', '#588157', '#3A5A40', '#D4A373', '#FAEDCD', '#E9D8A6', '#CA6702', '#2A9D8F'];
-      const particles = [];
-      const particleCount = 45;
-
-      for (let i = 0; i < particleCount; i++) {
-        particles.push({
-          x: canvas.width * 0.5 + (Math.random() - 0.5) * 80,
-          y: canvas.height * 0.4 + (Math.random() - 0.5) * 50,
-          vx: (Math.random() - 0.5) * 12,
-          vy: Math.random() * -10 - 4,
-          size: Math.random() * 8 + 5,
-          color: colors[Math.floor(Math.random() * colors.length)],
-          rotation: Math.random() * 360,
-          vRot: (Math.random() - 0.5) * 10,
-          alpha: 1
-        });
-      }
-
-      let frame = 0;
-      function animate() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        let alive = false;
-        particles.forEach(p => {
-          p.x += p.vx;
-          p.y += p.vy;
-          p.vy += 0.35; // gravity
-          p.vx *= 0.98; // drag
-          p.rotation += p.vRot;
-          if (frame > 25) p.alpha -= 0.025;
-
-          if (p.alpha > 0) {
-            alive = true;
-            ctx.save();
-            ctx.globalAlpha = Math.max(0, p.alpha);
-            ctx.translate(p.x, p.y);
-            ctx.rotate((p.rotation * Math.PI) / 180);
-            ctx.fillStyle = p.color;
-            ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 0.6);
-            ctx.restore();
-          }
-        });
-
-        frame++;
-        if (alive && frame < 90) {
-          requestAnimationFrame(animate);
-        } else {
-          ctx.clearRect(0, 0, canvas.width, canvas.height);
-        }
-      }
-      requestAnimationFrame(animate);
-    }
+    
 
     // --- 4. AVATAR DROP & SETTLE ANIMATION ---
     function playAvatarTransition(avatarKey) {
@@ -1161,7 +1102,6 @@
       initDateInputs();
       renderDashboard();
       const latestP = meals.filter(m => (m.datetime || '').startsWith(todayStr)).reduce((a,m)=>a+(m.protein||0), 0);
-      if (latestP >= (settings.protTarget || 100)) triggerEarthConfetti();
       renderMealList();
     }
 
@@ -1171,7 +1111,6 @@
       localStorage.setItem(KEY_MEALS, JSON.stringify(meals));
       renderDashboard();
       const latestP = meals.filter(m => (m.datetime || '').startsWith(todayStr)).reduce((a,m)=>a+(m.protein||0), 0);
-      if (latestP >= (settings.protTarget || 100)) triggerEarthConfetti();
       renderMealList();
     }
 
@@ -1222,9 +1161,7 @@
       initDateInputs();
       renderDashboard();
       const latestP = meals.filter(m => (m.datetime || '').startsWith(todayStr)).reduce((a,m)=>a+(m.protein||0), 0);
-      if (latestP >= (settings.protTarget || 100)) triggerEarthConfetti();
       renderWorkoutList();
-      triggerEarthConfetti();
     }
 
     function deleteWorkout(id) {
@@ -1233,9 +1170,7 @@
       localStorage.setItem(KEY_WORKOUTS, JSON.stringify(workouts));
       renderDashboard();
       const latestP = meals.filter(m => (m.datetime || '').startsWith(todayStr)).reduce((a,m)=>a+(m.protein||0), 0);
-      if (latestP >= (settings.protTarget || 100)) triggerEarthConfetti();
       renderWorkoutList();
-      triggerEarthConfetti();
     }
 
     function renderWorkoutList() {
@@ -1287,10 +1222,8 @@
 
       renderDashboard();
       const latestP = meals.filter(m => (m.datetime || '').startsWith(todayStr)).reduce((a,m)=>a+(m.protein||0), 0);
-      if (latestP >= (settings.protTarget || 100)) triggerEarthConfetti();
       renderBodyTable();
       updateChart();
-      triggerEarthConfetti();
     }
 
     function deleteBodyLog(date) {
@@ -1299,10 +1232,8 @@
       localStorage.setItem(KEY_BODY, JSON.stringify(bodyLogs));
       renderDashboard();
       const latestP = meals.filter(m => (m.datetime || '').startsWith(todayStr)).reduce((a,m)=>a+(m.protein||0), 0);
-      if (latestP >= (settings.protTarget || 100)) triggerEarthConfetti();
       renderBodyTable();
       updateChart();
-      triggerEarthConfetti();
     }
 
     function renderBodyTable() {
@@ -1573,7 +1504,6 @@
       closeSettingsModal();
       renderDashboard();
       const latestP = meals.filter(m => (m.datetime || '').startsWith(todayStr)).reduce((a,m)=>a+(m.protein||0), 0);
-      if (latestP >= (settings.protTarget || 100)) triggerEarthConfetti();
       alert('設定已儲存！');
     }
 
