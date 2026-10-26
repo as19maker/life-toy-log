@@ -679,7 +679,12 @@
     }));
 
     // Daily Coin Tracking State (Reset at new date)
-    const todayStr = new Date().toISOString().slice(0, 10);
+    function getLocalISODate() {
+      const now = new Date();
+      const tzOffset = now.getTimezoneOffset() * 60000;
+      return (new Date(Date.now() - tzOffset)).toISOString().slice(0, 10);
+    }
+    const todayStr = getLocalISODate();
     let dailyCoinsData = JSON.parse(localStorage.getItem(KEY_DAILY_COINS) || '{"date":"","earned":0}');
     if (dailyCoinsData.date !== todayStr) {
       dailyCoinsData = { date: todayStr, earned: 0 };
@@ -788,7 +793,7 @@
 
     function executeGachaLogic() {
       // Check Lucky Buff today
-      const todayPrefix = new Date().toISOString().slice(0, 10);
+      const todayPrefix = getLocalISODate();
       const todayMeals = meals.filter(m => (m.datetime || '').startsWith(todayPrefix));
       const todayProt = todayMeals.reduce((acc, m) => acc + (m.protein || 0), 0);
       const todayHasWorkout = workouts.some(w => w.date === todayPrefix);
@@ -1453,7 +1458,7 @@
 
     // --- DASHBOARD METRICS ---
     function renderDashboard() {
-      const todayPrefix = new Date().toISOString().slice(0, 10);
+      const todayPrefix = getLocalISODate();
       const todayMeals = meals.filter(m => (m.datetime || '').startsWith(todayPrefix));
       const totalCal = Math.round(todayMeals.reduce((acc, m) => acc + (m.calories || 0), 0));
       const totalProt = Math.round(todayMeals.reduce((acc, m) => acc + (m.protein || 0), 0) * 10) / 10;
