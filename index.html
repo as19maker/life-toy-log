@@ -20,17 +20,8 @@
     .spin-active {
       animation: spinLever 0.6s cubic-bezier(0.4, 0, 0.2, 1);
     }
-    @keyframes dropBall {
-      0% { transform: translateY(-40px) scale(0.5); opacity: 0; }
-      60% { transform: translateY(10px) scale(1.1); opacity: 1; }
-      80% { transform: translateY(-4px) scale(0.95); }
-      100% { transform: translateY(0) scale(1); opacity: 1; }
-    }
-    .ball-drop {
-      animation: dropBall 0.5s ease-out forwards;
-    }
     @keyframes popCard {
-      0% { transform: scale(0.85); opacity: 0; }
+      0% { transform: scale(0.88); opacity: 0; }
       100% { transform: scale(1); opacity: 1; }
     }
     .modal-pop {
@@ -42,22 +33,22 @@
 
   <!-- Header -->
   <header class="sticky top-0 z-40 bg-white/95 backdrop-blur border-b border-slate-200">
-    <div class="max-w-3xl mx-auto px-4 h-15 flex items-center justify-between">
+    <div class="max-w-3xl mx-auto px-4 h-14 flex items-center justify-between">
       <div class="flex items-center space-x-2.5">
-        <div class="w-9 h-9 rounded-xl bg-amber-100 flex items-center justify-center text-xl">
-          🐱
+        <div class="w-8 h-8 rounded-xl bg-amber-100 flex items-center justify-center text-amber-800 font-extrabold text-sm shadow-inner">
+          LT
         </div>
         <div>
           <div class="flex items-center gap-1.5">
             <h1 class="text-sm font-extrabold text-slate-900 tracking-tight">LIFE TOY LOG</h1>
-            <span class="text-[10px] font-bold px-1.5 py-0.2 rounded bg-amber-50 text-amber-800 border border-amber-200">扭蛋生活</span>
+            <span class="text-[10px] font-bold px-1.5 py-0.2 rounded bg-amber-50 text-amber-800 border border-amber-200">2個月收藏季</span>
           </div>
-          <p class="text-[11px] text-slate-400" id="headerDate">--</p>
+          <p class="text-[10px] text-slate-400" id="headerDate">--</p>
         </div>
       </div>
       <div class="flex items-center gap-2">
-        <div class="flex items-center gap-1 bg-amber-50 border border-amber-200 px-2.5 py-1 rounded-full text-xs font-bold text-amber-700">
-          <span>🪙</span>
+        <div class="flex items-center gap-1 bg-amber-50 border border-amber-200 px-2.5 py-0.5 rounded-full text-xs font-bold text-amber-700">
+          <span class="text-amber-500 font-extrabold">🪙</span>
           <span id="coinDisplay">0</span>
         </div>
         <button onclick="exportToCSV()" title="匯出 CSV" class="p-1.5 text-slate-600 hover:bg-slate-100 rounded-lg text-xs font-medium">
@@ -74,44 +65,44 @@
   <main class="max-w-3xl mx-auto px-4 py-4 space-y-4">
 
     <!-- HERO: GACHA MACHINE STAGE -->
-    <section class="bg-gradient-to-b from-white to-amber-50/40 rounded-2xl p-4 border border-amber-200/70 shadow-sm relative overflow-hidden">
+    <section class="bg-gradient-to-b from-white to-amber-50/40 rounded-2xl p-4 border border-amber-200/80 shadow-xs relative overflow-hidden">
       <div class="flex items-center justify-between gap-4">
         
         <!-- Left: Gacha Visual -->
         <div class="flex items-center gap-3">
-          <div class="w-20 h-24 bg-white rounded-2xl border-2 border-amber-200 shadow-inner flex flex-col items-center justify-between p-2 relative">
+          <div class="w-18 h-22 bg-white rounded-2xl border-2 border-amber-200/90 shadow-inner flex flex-col items-center justify-between p-2 relative shrink-0">
             <!-- Glass Dome with balls -->
-            <div class="w-16 h-12 bg-amber-50/70 rounded-xl flex items-center justify-center gap-1 text-xs border border-amber-100">
-              <span class="transform -translate-y-1">🔴</span>
-              <span class="transform translate-y-1">🟡</span>
-              <span class="transform -translate-y-0.5">🟢</span>
+            <div class="w-14 h-10 bg-amber-50/80 rounded-xl flex items-center justify-center gap-1 border border-amber-100">
+              <span class="w-2.5 h-2.5 rounded-full bg-rose-500 shadow-2xs"></span>
+              <span class="w-2.5 h-2.5 rounded-full bg-amber-400 shadow-2xs"></span>
+              <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-2xs"></span>
             </div>
             <!-- Crank Slot -->
             <div id="gachaLever" class="w-6 h-6 rounded-full bg-slate-800 text-white flex items-center justify-center text-[10px] shadow cursor-pointer">
-              🌀
+              ⟳
             </div>
           </div>
           <div>
             <div class="flex items-center gap-1.5">
               <h2 class="text-sm font-bold text-slate-900">生活微縮扭蛋機</h2>
-              <span class="text-[10px] font-semibold text-amber-700 bg-amber-100/70 px-1.5 py-0.2 rounded" id="buffLabel">常態掉落</span>
+              <span class="text-[10px] font-semibold text-amber-700 bg-amber-100/70 px-1.5 py-0.2 rounded" id="buffLabel">常態掉落 (25%)</span>
             </div>
-            <p class="text-xs text-slate-500 mt-0.5">紀錄飲食(+1🪙)、體態(+1🪙)、運動(+2🪙)</p>
-            <div class="text-[11px] text-slate-400 mt-1">
-              已收集圖鑑：<b class="text-slate-800" id="collectionRatio">0 / 12</b>
+            <p class="text-xs text-slate-500 mt-0.5" id="dailyCoinStatus">今日已賺 0 / 8 🪙 (每扭需 4 🪙)</p>
+            <div class="text-[11px] text-slate-400 mt-0.5">
+              展示架收集進度：<b class="text-slate-800" id="collectionRatio">0 / 12</b> (預期約 45~60 天)
             </div>
           </div>
         </div>
 
         <!-- Right: Crank Action -->
         <button onclick="playGacha()" class="px-4 py-3 bg-slate-900 hover:bg-slate-800 active:scale-95 text-white font-bold text-xs rounded-xl shadow transition flex flex-col items-center gap-0.5 shrink-0">
-          <span>扭一次</span>
-          <span class="text-[10px] text-amber-300 font-normal">消耗 1 🪙</span>
+          <span>轉動扭蛋</span>
+          <span class="text-[10px] text-amber-300 font-normal">4 🪙 / 次</span>
         </button>
       </div>
 
       <!-- Quick Metrics Strip -->
-      <div class="grid grid-cols-4 gap-2 text-center text-xs mt-3 pt-3 border-t border-amber-100">
+      <div class="grid grid-cols-4 gap-2 text-center text-xs mt-3 pt-3 border-t border-amber-100/80">
         <div>
           <span class="text-[10px] text-slate-400 block">今日熱量</span>
           <span class="font-bold text-slate-800" id="todayCal">0</span> <span class="text-[9px] text-slate-400">kcal</span>
@@ -125,7 +116,7 @@
           <span class="font-bold text-slate-800" id="todayWorkout">0</span> <span class="text-[9px] text-slate-400">分</span>
         </div>
         <div>
-          <span class="text-[10px] text-slate-400 block">最新體態</span>
+          <span class="text-[10px] text-slate-400 block">最新體重</span>
           <span class="font-bold text-emerald-600" id="latestWeight">--</span> <span class="text-[9px] text-slate-400">kg</span>
         </div>
       </div>
@@ -134,16 +125,16 @@
     <!-- NAVIGATION TABS -->
     <div class="flex items-center space-x-1 border-b border-slate-200">
       <button onclick="switchTab('meals')" id="tabBtn-meals" class="px-3.5 py-2 text-xs font-bold border-b-2 border-slate-900 text-slate-900 transition">
-        🍽️ 飲食記錄
+        飲食記錄
       </button>
       <button onclick="switchTab('workout')" id="tabBtn-workout" class="px-3.5 py-2 text-xs font-medium border-b-2 border-transparent text-slate-500 hover:text-slate-800 transition">
-        🏋️ 運動鍛鍊
+        運動鍛鍊
       </button>
       <button onclick="switchTab('body')" id="tabBtn-body" class="px-3.5 py-2 text-xs font-medium border-b-2 border-transparent text-slate-500 hover:text-slate-800 transition">
-        ⚖️ 體重腰圍
+        體重腰圍
       </button>
       <button onclick="switchTab('showcase')" id="tabBtn-showcase" class="px-3.5 py-2 text-xs font-medium border-b-2 border-transparent text-slate-500 hover:text-slate-800 transition">
-        🎁 扭蛋展示架
+        微縮展示架
       </button>
     </div>
 
@@ -152,7 +143,7 @@
       <section class="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-xs">
         <h3 class="font-bold text-slate-800 text-xs mb-3 flex items-center justify-between">
           <span>新增一餐</span>
-          <span class="text-[11px] text-amber-600 font-semibold">+1 🪙</span>
+          <span class="text-[11px] text-amber-600 font-semibold">+1 🪙 (每日上限 8 🪙)</span>
         </h3>
 
         <form id="mealForm" onsubmit="handleMealSubmit(event)" class="space-y-3">
@@ -177,12 +168,11 @@
             <label class="block text-[11px] font-medium text-slate-600 mb-1">食物照片 (自動壓縮)</label>
             <div class="flex items-center gap-2">
               <label class="flex-1 flex items-center justify-center gap-1.5 border border-dashed border-slate-300 bg-slate-50 rounded-xl px-3 py-2 cursor-pointer text-xs text-slate-600 hover:bg-slate-100">
-                <span>📷</span>
-                <span id="photoLabel">拍照或選擇照片</span>
+                <span id="photoLabel">選取或拍攝照片</span>
                 <input type="file" id="mealPhotoInput" accept="image/*" class="hidden" onchange="handlePhotoSelect(event)">
               </label>
               <button type="button" id="btnAnalyzeAI" onclick="analyzeFoodWithAI()" class="hidden px-3 py-2 bg-slate-900 text-white rounded-xl text-xs font-semibold">
-                ✨ AI 估算
+                AI 估算
               </button>
             </div>
             <div id="imagePreviewContainer" class="hidden mt-2 relative inline-block">
@@ -242,13 +232,13 @@
             <div>
               <label class="block text-[11px] font-medium text-slate-600 mb-1">運動類型</label>
               <select id="workoutType" class="w-full text-xs bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-2">
-                <option value="🏋️ 重訓 / 阻力訓練" selected>🏋️ 重訓 / 阻力訓練</option>
-                <option value="⚡ 功能性團課 / F45">⚡ 功能性團課 / F45</option>
-                <option value="🛹 滑板練習 / 技巧板">🛹 滑板練習 / 技巧板</option>
-                <option value="🚶 走路機 / 散步">🚶 走路機 / 散步</option>
-                <option value="🚲 戶外騎乘 / 通勤">🚲 戶外騎乘 / 通勤</option>
-                <option value="🧘 滾筒放鬆 / 伸展">🧘 滾筒放鬆 / 伸展</option>
-                <option value="🎯 其他運動">🎯 其他運動</option>
+                <option value="重訓 / 阻力訓練" selected>重訓 / 阻力訓練</option>
+                <option value="功能性團課 / F45">功能性團課 / F45</option>
+                <option value="滑板練習 / 技巧板">滑板練習 / 技巧板</option>
+                <option value="走路機 / 散步">走路機 / 散步</option>
+                <option value="戶外騎乘 / 通勤">戶外騎乘 / 通勤</option>
+                <option value="滾筒放鬆 / 伸展">滾筒放鬆 / 伸展</option>
+                <option value="其他運動">其他運動</option>
               </select>
             </div>
             <div>
@@ -347,8 +337,8 @@
       <section class="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-xs">
         <div class="flex items-center justify-between mb-3">
           <div>
-            <h3 class="font-bold text-slate-800 text-sm">我的生活扭蛋展示架</h3>
-            <p class="text-xs text-slate-400">抽到收藏物會放入展示格，空格等待解鎖！</p>
+            <h3 class="font-bold text-slate-800 text-sm">我的生活微縮展示架</h3>
+            <p class="text-xs text-slate-400">12 款質感插畫模型，預期需 1.5 ~ 2 個月收集完整</p>
           </div>
           <span class="text-xs font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200" id="showcaseCountBadge">
             0 / 12
@@ -366,8 +356,8 @@
   <!-- GACHA MODAL -->
   <div id="gachaModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs hidden flex items-center justify-center p-4">
     <div class="bg-white rounded-3xl max-w-sm w-full p-6 text-center shadow-2xl border border-slate-100 modal-pop space-y-3">
-      <div id="gachaRevealIcon" class="w-16 h-16 mx-auto rounded-2xl bg-amber-50 flex items-center justify-center text-3xl shadow-inner">
-        📦
+      <div id="gachaRevealIcon" class="w-16 h-16 mx-auto rounded-2xl bg-slate-50 flex items-center justify-center shadow-inner">
+        <!-- SVG will be injected here -->
       </div>
       <div>
         <span id="gachaRarityTag" class="text-[10px] uppercase font-bold text-amber-800 bg-amber-100/70 px-2 py-0.5 rounded-full border border-amber-200">
@@ -445,43 +435,76 @@
     const KEY_WORKOUTS = 'toy_log_workouts_v2';
     const KEY_SETTINGS = 'toy_log_settings_v2';
     const KEY_SHOWCASE = 'toy_log_showcase_v1';
+    const KEY_DAILY_COINS = 'toy_log_daily_coins_v1';
+
+    // SVG Illustration Assets Dictionary
+    const SVG_LIB = {
+      kettle: `<svg viewBox="0 0 48 48" class="w-10 h-10 mx-auto" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="48" height="48" rx="12" fill="#F1F5F9"/><path d="M14 34L17 19H31L34 34C34 36 32 37 30 37H18C16 37 14 36 14 34Z" fill="#334155"/><path d="M19 19L21 15H27L29 19H19Z" fill="#1E293B"/><circle cx="24" cy="13.5" r="2" fill="#D97706"/><path d="M14 22L9 26C8 27 8 29 10 30L14 31" stroke="#334155" stroke-width="2.5" stroke-linecap="round"/><path d="M33 22C38 23 40 27 38 31C37 33 34 33 33 33" stroke="#334155" stroke-width="2.5" stroke-linecap="round"/><path d="M22 25H26" stroke="#94A3B8" stroke-width="1.5" stroke-linecap="round"/></svg>`,
+      bread: `<svg viewBox="0 0 48 48" class="w-10 h-10 mx-auto" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="48" height="48" rx="12" fill="#FEF3C7"/><path d="M11 26C11 18 17 13 24 13C31 13 37 18 37 26C37 32 31 35 24 35C17 35 11 32 11 26Z" fill="#D97706"/><path d="M13 25C13 19 18 15 24 15C30 15 35 19 35 25C35 30 30 33 24 33C18 33 13 30 13 25Z" fill="#F59E0B"/><path d="M18 20L20 28M23 18L25 29M28 20L30 28" stroke="#78350F" stroke-width="2" stroke-linecap="round"/></svg>`,
+      skateboard: `<svg viewBox="0 0 48 48" class="w-10 h-10 mx-auto" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="48" height="48" rx="12" fill="#F0FDF4"/><path d="M10 21C13 23 35 23 38 21L39 23C36 26 12 26 9 23L10 21Z" fill="#15803D"/><rect x="11" y="22" width="26" height="2" fill="#22C55E"/><circle cx="15" cy="27" r="3" fill="#0F172A"/><circle cx="15" cy="27" r="1.5" fill="#94A3B8"/><circle cx="33" cy="27" r="3" fill="#0F172A"/><circle cx="33" cy="27" r="1.5" fill="#94A3B8"/><path d="M15 24V26M33 24V26" stroke="#64748B" stroke-width="2"/></svg>`,
+      wristwrap: `<svg viewBox="0 0 48 48" class="w-10 h-10 mx-auto" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="48" height="48" rx="12" fill="#EFF6FF"/><rect x="14" y="16" width="20" height="16" rx="4" fill="#2563EB"/><path d="M14 22H34M14 26H34" stroke="#60A5FA" stroke-width="2"/><rect x="21" y="19" width="6" height="10" rx="1.5" fill="#1E40AF"/><path d="M24 21V27" stroke="#FFFFFF" stroke-width="1.5" stroke-linecap="round"/></svg>`,
+      walkingpad: `<svg viewBox="0 0 48 48" class="w-10 h-10 mx-auto" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="48" height="48" rx="12" fill="#F8FAFC"/><rect x="10" y="19" width="28" height="13" rx="4" fill="#334155"/><rect x="14" y="22" width="20" height="7" rx="2" fill="#0F172A"/><circle cx="33" cy="25.5" r="1.5" fill="#22C55E"/><path d="M17 25.5H27" stroke="#475569" stroke-width="1" stroke-dasharray="2 2"/></svg>`,
+      catbox: `<svg viewBox="0 0 48 48" class="w-10 h-10 mx-auto" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="48" height="48" rx="12" fill="#FFFBEB"/><path d="M16 19L20 15L23 18C23.6 18 24.4 18 25 18L28 15L32 19C33 22 31 26 24 26C17 26 15 22 16 19Z" fill="#94A3B8"/><circle cx="21" cy="21" r="1.2" fill="#1E293B"/><circle cx="27" cy="21" r="1.2" fill="#1E293B"/><path d="M12 23H36V34C36 35.5 34.5 36.5 33 36.5H15C13.5 36.5 12 35.5 12 34V23Z" fill="#D97706"/><path d="M10 23H38V26H10V23Z" fill="#B45309"/></svg>`,
+      catpaw: `<svg viewBox="0 0 48 48" class="w-10 h-10 mx-auto" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="48" height="48" rx="12" fill="#FDF2F8"/><ellipse cx="24" cy="27" rx="8" ry="6.5" fill="#FDA4AF"/><circle cx="16" cy="19" r="2.8" fill="#FB7185"/><circle cx="21.5" cy="16.5" r="3" fill="#FB7185"/><circle cx="26.5" cy="16.5" r="3" fill="#FB7185"/><circle cx="32" cy="19" r="2.8" fill="#FB7185"/></svg>`,
+      roller: `<svg viewBox="0 0 48 48" class="w-10 h-10 mx-auto" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="48" height="48" rx="12" fill="#F1F5F9"/><rect x="15" y="12" width="18" height="12" rx="3" fill="#E2E8F0"/><path d="M15 15H33M15 19H33M15 21H33" stroke="#CBD5E1" stroke-width="1"/><path d="M24 24V34C24 35 25 36 26 36H28" stroke="#64748B" stroke-width="2.5" stroke-linecap="round"/><rect x="25" y="32" width="5" height="11" rx="2" fill="#334155"/></svg>`,
+      goldtoy: `<svg viewBox="0 0 48 48" class="w-10 h-10 mx-auto" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="48" height="48" rx="12" fill="#FEFCE8"/><ellipse cx="24" cy="40" rx="11" ry="3" fill="#E2E8F0"/><circle cx="24" cy="19" r="7.5" fill="#1E293B"/><circle cx="24" cy="11.5" r="2.5" fill="#1E293B"/><path d="M17 25C17 23 20 23 24 23C28 23 31 23 31 25L32 35C32 36 30 37 28 37H20C18 37 16 36 16 35L17 25Z" fill="#D97706"/><circle cx="22" cy="18.5" r="1" fill="#FEF08A"/><circle cx="26" cy="18.5" r="1" fill="#FEF08A"/></svg>`,
+      goldmedal: `<svg viewBox="0 0 48 48" class="w-10 h-10 mx-auto" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="48" height="48" rx="12" fill="#FEF9C3"/><path d="M19 11L24 22L29 11" stroke="#DC2626" stroke-width="3" stroke-linecap="round"/><circle cx="24" cy="27" r="9" fill="#EAB308"/><circle cx="24" cy="27" r="7" fill="#FACC15"/><path d="M24 23V31M21 26L27 28" stroke="#A16207" stroke-width="1.8" stroke-linecap="round"/></svg>`,
+      coldbrew: `<svg viewBox="0 0 48 48" class="w-10 h-10 mx-auto" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="48" height="48" rx="12" fill="#F0FDFA"/><path d="M17 17L19 35C19 36.5 20.5 37.5 22 37.5H26C27.5 37.5 29 36.5 29 35L31 17H17Z" fill="#78350F"/><rect x="16" y="14" width="16" height="3" rx="1.5" fill="#0D9488"/><rect x="21" y="21" width="6" height="5" rx="1" fill="#FEF3C7" opacity="0.4"/><path d="M26 11L28 15" stroke="#14B8A6" stroke-width="2" stroke-linecap="round"/></svg>`,
+      suncat: `<svg viewBox="0 0 48 48" class="w-10 h-10 mx-auto" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="48" height="48" rx="12" fill="#FFF7ED"/><circle cx="34" cy="14" r="5" fill="#FDBA74"/><path d="M12 32C12 26 18 23 25 23C32 23 35 27 35 32H12Z" fill="#94A3B8"/><path d="M15 24L17 20L20 23" fill="#64748B"/><path d="M18 28Q22 30 26 28" stroke="#1E293B" stroke-width="1.2" stroke-linecap="round"/></svg>`,
+      scroll: `<svg viewBox="0 0 48 48" class="w-12 h-12 mx-auto" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="48" height="48" rx="14" fill="#F1F5F9"/><rect x="14" y="14" width="20" height="20" rx="3" fill="#FFFFFF" stroke="#94A3B8" stroke-width="2"/><path d="M19 20H29M19 24H27M19 28H24" stroke="#CBD5E1" stroke-width="2" stroke-linecap="round"/></svg>`,
+      measure: `<svg viewBox="0 0 48 48" class="w-12 h-12 mx-auto" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="48" height="48" rx="14" fill="#FEF3C7"/><path d="M13 24H35" stroke="#F59E0B" stroke-width="6" stroke-linecap="round"/><path d="M17 22V26M21 22V26M25 22V26M29 22V26M33 22V26" stroke="#FFFFFF" stroke-width="1.5"/><path d="M23 20L25 28" stroke="#DC2626" stroke-width="2"/></svg>`,
+      button: `<svg viewBox="0 0 48 48" class="w-12 h-12 mx-auto" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="48" height="48" rx="14" fill="#F8FAFC"/><circle cx="24" cy="24" r="10" fill="#E2E8F0" stroke="#94A3B8" stroke-width="2"/><circle cx="21" cy="21" r="1.5" fill="#475569"/><circle cx="27" cy="21" r="1.5" fill="#475569"/><circle cx="21" cy="27" r="1.5" fill="#475569"/><circle cx="27" cy="27" r="1.5" fill="#475569"/><path d="M21 21L27 27M27 21L21 27" stroke="#DC2626" stroke-width="1.2"/></svg>`,
+      emptybag: `<svg viewBox="0 0 48 48" class="w-12 h-12 mx-auto" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="48" height="48" rx="14" fill="#FFFBEB"/><path d="M16 17L18 33C18 34 19 35 20 35H28C29 35 30 34 30 33L32 17H16Z" fill="#D97706"/><path d="M15 17L17 15L19 17L21 15L23 17L25 15L27 17L29 15L31 17L33 15" stroke="#B45309" stroke-width="1.5"/></svg>`,
+      whisker: `<svg viewBox="0 0 48 48" class="w-12 h-12 mx-auto" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="48" height="48" rx="14" fill="#F0FDF4"/><path d="M14 30C22 30 26 22 34 18" stroke="#16A34A" stroke-width="2.5" stroke-linecap="round"/><circle cx="34" cy="18" r="1.5" fill="#22C55E"/></svg>`
+    };
 
     // 12 Collectible items for the Showcase Gallery
     const COLLECTIBLE_ITEMS = [
-      { id: 'item_1', name: '手沖黑金壺', icon: '☕', category: '生活道具', rarity: '稀有', quote: '慢慢滴濾，代謝跟生活都需要一點萃取時間。' },
-      { id: 'item_2', name: '剛出爐脆皮歐包', icon: '🥖', category: '生活道具', rarity: '普通', quote: '優質碳水是肌肉的柴火，吃得心安理得。' },
-      { id: 'item_3', name: '技術滑板與軟輪', icon: '🛹', category: '生活道具', rarity: '稀有', quote: '重心放低，即使今天稍微晃了一下，也沒摔倒。' },
-      { id: 'item_4', name: '深蹲護腕', icon: '🏋️', category: '生活道具', rarity: '普通', quote: '今天核心收得很緊，推蹬感受度扎實。' },
-      { id: 'item_5', name: '室內走路機踏板', icon: '🚶', category: '生活道具', rarity: '普通', quote: '邊看影片邊走個幾千步，微小的事情會聚沙成塔。' },
-      { id: 'item_6', name: '紙箱溢出貓', icon: '📦', category: '貓咪日常', rarity: '稀有', quote: '不管箱子多小，肉肉溢出來了也是舒服的。' },
-      { id: 'item_7', name: '清晨踩肚肉爪', icon: '🐾', category: '貓咪日常', rarity: '普通', quote: '天然定時鬧鐘，準時在肚皮上踏踏催開飯。' },
-      { id: 'item_8', name: '滿載貓毛黏黏滾筒', icon: '🧹', category: '貓咪日常', rarity: '普通', quote: '黑色衣服是貓奴的禁忌，但我們早已妥協。' },
-      { id: 'item_9', name: '黑金限定生活公仔', icon: '🧸', category: '隱藏限定', rarity: '傳奇', quote: '同一套衣服穿出全新鬆弛感，步調在自己手裡。' },
-      { id: 'item_10', name: '純金蛋白質達標金牌', icon: '🥇', category: '隱藏限定', rarity: '傳奇', quote: '今天蛋白質完全吃夠，修復與代謝都在發光。' },
-      { id: 'item_11', name: '冷萃咖啡微縮杯', icon: '🧊', category: '生活道具', rarity: '普通', quote: '冰涼醇厚，午後提神無負擔的純粹快樂。' },
-      { id: 'item_12', name: '曬太陽放空貓', icon: '☀️', category: '貓咪日常', rarity: '稀有', quote: '偶爾無所事事地攤平，也是很重要的生理修復。' }
+      { id: 'item_1', name: '手沖黑金壺', svgKey: 'kettle', category: '生活道具', rarity: '稀有', quote: '慢慢滴濾，代謝跟生活都需要一點萃取時間。' },
+      { id: 'item_2', name: '剛出爐脆皮歐包', svgKey: 'bread', category: '生活道具', rarity: '普通', quote: '優質碳水是肌肉的柴火，吃得心安理得。' },
+      { id: 'item_3', name: '技術滑板與軟輪', svgKey: 'skateboard', category: '生活道具', rarity: '稀有', quote: '重心放低，即使今天稍微晃了一下，也沒摔倒。' },
+      { id: 'item_4', name: '深蹲護腕', svgKey: 'wristwrap', category: '生活道具', rarity: '普通', quote: '今天核心收得很緊，推蹬感受度扎實。' },
+      { id: 'item_5', name: '室內走路機踏板', svgKey: 'walkingpad', category: '生活道具', rarity: '普通', quote: '邊看影片邊走個幾千步，微小的事情會聚沙成塔。' },
+      { id: 'item_6', name: '紙箱溢出貓', svgKey: 'catbox', category: '貓咪日常', rarity: '稀有', quote: '不管箱子多小，肉肉溢出來了也是舒服的。' },
+      { id: 'item_7', name: '清晨踩肚肉爪', svgKey: 'catpaw', category: '貓咪日常', rarity: '普通', quote: '天然定時鬧鐘，準時在肚皮上踏踏催開飯。' },
+      { id: 'item_8', name: '滿載貓毛黏黏滾筒', svgKey: 'roller', category: '貓咪日常', rarity: '普通', quote: '黑色衣服是貓奴的禁忌，但我們早已妥協。' },
+      { id: 'item_9', name: '黑金限定生活公仔', svgKey: 'goldtoy', category: '隱藏限定', rarity: '傳奇', quote: '同一套衣服穿出全新鬆弛感，步調在自己手裡。' },
+      { id: 'item_10', name: '純金蛋白質達標金牌', svgKey: 'goldmedal', category: '隱藏限定', rarity: '傳奇', quote: '今天蛋白質完全吃夠，修復與代謝都在發光。' },
+      { id: 'item_11', name: '冷萃咖啡微縮杯', svgKey: 'coldbrew', category: '生活道具', rarity: '普通', quote: '冰涼醇厚，午後提神無負擔的純粹快樂。' },
+      { id: 'item_12', name: '曬太陽放空貓', svgKey: 'suncat', category: '貓咪日常', rarity: '稀有', quote: '偶爾無所事事地攤平，也是很重要的生理修復。' }
     ];
 
-    // Funny Empty Shells / Consolation Notes (銘謝惠顧 / 幽默字條，不佔格子)
+    // Dummy Notes (銘謝惠顧 / 幽默字條)
     const DUMMY_NOTES = [
-      { name: '空白籤詩', icon: '📜', quote: '蛋殼裡只有一張紙條：『今天水喝夠 2000cc 了嗎？』' },
-      { name: '斷掉的皮尺', icon: '📏', quote: '今天腰圍多了一公分？一定是皮尺被拉鬆了，明天再量。' },
-      { name: '微繃的鈕扣', icon: '🔘', quote: '最下面這顆釦子今天已經盡力了，晚上放它一馬。' },
-      { name: '空的歐包紙袋', icon: '🥐', quote: '熱量已經轉化為肌肉能量，只留下香氣記憶。' },
-      { name: '掉落的貓鬍鬚', icon: '🌾', quote: '傳說撿到貓鬍鬚會帶來幸運，明天繼續打卡試試手氣！' }
+      { name: '空白籤詩', svgKey: 'scroll', quote: '蛋殼裡只有一張紙條：『今天水喝夠 2000cc 了嗎？』' },
+      { name: '斷掉的皮尺', svgKey: 'measure', quote: '今天腰圍多了一公分？一定是皮尺被拉鬆了，明天再量。' },
+      { name: '微繃的鈕扣', svgKey: 'button', quote: '最下面這顆釦子今天已經盡力了，晚上放它一馬。' },
+      { name: '空的歐包紙袋', svgKey: 'emptybag', quote: '熱量已經轉化為肌肉能量，只留下香氣記憶。' },
+      { name: '掉落的貓鬍鬚', svgKey: 'whisker', quote: '傳說撿到貓鬍鬚會帶來幸運，明天繼續打卡試試手氣！' }
     ];
 
     // Data State
     let meals = JSON.parse(localStorage.getItem(KEY_MEALS) || '[]');
     let bodyLogs = JSON.parse(localStorage.getItem(KEY_BODY) || '[]');
     let workouts = JSON.parse(localStorage.getItem(KEY_WORKOUTS) || '[]');
-    let showcase = JSON.parse(localStorage.getItem(KEY_SHOWCASE) || JSON.stringify(['item_1', 'item_7']));
+    let showcase = JSON.parse(localStorage.getItem(KEY_SHOWCASE) || JSON.stringify(['item_1']));
     let settings = JSON.parse(localStorage.getItem(KEY_SETTINGS) || JSON.stringify({
-      coins: 5,
+      coins: 4,
       calTarget: 1800,
       protTarget: 100,
       geminiKey: ''
     }));
+
+    // Daily Coin Tracking State (Reset at new date)
+    const todayStr = new Date().toISOString().slice(0, 10);
+    let dailyCoinsData = JSON.parse(localStorage.getItem(KEY_DAILY_COINS) || '{"date":"","earned":0}');
+    if (dailyCoinsData.date !== todayStr) {
+      dailyCoinsData = { date: todayStr, earned: 0 };
+      localStorage.setItem(KEY_DAILY_COINS, JSON.stringify(dailyCoinsData));
+    }
+
+    const DAILY_COIN_CAP = 8; // Max 8 coins per day
+    const COST_PER_GACHA = 4; // 4 coins per draw -> Exactly max 2 draws per day!
 
     let currentPhotoBase64 = null;
     let chartInstance = null;
@@ -509,6 +532,7 @@
 
       document.getElementById('headerDate').innerText = now.toLocaleDateString('zh-TW', { month: 'numeric', day: 'numeric', weekday: 'short' });
       document.getElementById('coinDisplay').innerText = settings.coins || 0;
+      document.getElementById('dailyCoinStatus').innerText = `今日已賺 ${dailyCoinsData.earned} / ${DAILY_COIN_CAP} 🪙 (每扭需 4 🪙)`;
     }
 
     // --- TAB SWITCHER ---
@@ -527,62 +551,70 @@
       if (tab === 'body') updateChart();
     }
 
-    // --- GACHA CORE (VARIABLE RATIO SCHEDULE) ---
+    // --- GACHA CORE (2-MONTH CYCLE REBALANCED) ---
     function playGacha() {
-      if ((settings.coins || 0) < 1) {
-        alert('🪙 扭蛋幣不足！記錄一次飲食 (+1🪙)、體態打卡 (+1🪙) 或運動 (+2🪙) 賺取扭蛋幣吧！');
+      if ((settings.coins || 0) < COST_PER_GACHA) {
+        alert(`🪙 扭蛋幣不足！轉動一次需要 ${COST_PER_GACHA} 🪙。請先記錄飲食、體態或運動累積金幣！`);
         return;
       }
 
-      // Deduct coin
-      addCoins(-1);
+      // Deduct coins
+      addCoins(-COST_PER_GACHA);
 
       // Crank lever animation
       const lever = document.getElementById('gachaLever');
       lever.classList.add('spin-active');
       setTimeout(() => lever.classList.remove('spin-active'), 600);
 
-      // Determine lucky buff today (if workout done or protein >= 80g)
+      // Check Lucky Buff today
       const todayPrefix = new Date().toISOString().slice(0, 10);
       const todayMeals = meals.filter(m => (m.datetime || '').startsWith(todayPrefix));
       const todayProt = todayMeals.reduce((acc, m) => acc + (m.protein || 0), 0);
       const todayHasWorkout = workouts.some(w => w.date === todayPrefix);
       const isBuffed = (todayProt >= 80) || todayHasWorkout;
 
-      // Drop Probabilities:
-      // Normal: 40% empty shell, 60% real item
-      // Buffed: 20% empty shell, 80% real item
-      const emptyChance = isBuffed ? 0.20 : 0.40;
+      // 2-Month Collection Curve:
+      // Normal: 75% empty shell, 25% collectible item
+      // Buffed: 55% empty shell, 45% collectible item
+      const emptyChance = isBuffed ? 0.55 : 0.75;
       const roll = Math.random();
 
       let result = null;
       let isItem = false;
+      let isDuplicate = false;
 
       if (roll < emptyChance) {
         // Drop an empty shell / funny note
         result = DUMMY_NOTES[Math.floor(Math.random() * DUMMY_NOTES.length)];
         isItem = false;
       } else {
-        // Drop a real collectible item
+        // Drop a collectible item (duplicates allowed to extend cycle!)
         result = COLLECTIBLE_ITEMS[Math.floor(Math.random() * COLLECTIBLE_ITEMS.length)];
         isItem = true;
-        if (!showcase.includes(result.id)) {
+        if (showcase.includes(result.id)) {
+          isDuplicate = true;
+          // Duplicate reward: refund 1 coin
+          addCoins(1);
+        } else {
           showcase.push(result.id);
           localStorage.setItem(KEY_SHOWCASE, JSON.stringify(showcase));
           renderShowcase();
         }
       }
 
-      // Show Gacha Result in Modal
-      document.getElementById('gachaRevealIcon').innerText = result.icon;
+      // Render Modal with Vector Illustration
+      document.getElementById('gachaRevealIcon').innerHTML = SVG_LIB[result.svgKey] || '';
       document.getElementById('gachaCardTitle').innerText = result.name;
       document.getElementById('gachaCardQuote').innerText = `「${result.quote}」`;
-      document.getElementById('gachaRarityTag').innerText = isItem ? result.rarity : '幽默小籤';
-      document.getElementById('gachaRarityTag').className = isItem && result.rarity === '傳奇' ? 
+      
+      const tag = document.getElementById('gachaRarityTag');
+      tag.innerText = isItem ? (isDuplicate ? `${result.rarity}・重複款 (+1🪙)` : result.rarity) : '幽默小籤';
+      tag.className = isItem && result.rarity === '傳奇' ? 
         'text-[10px] uppercase font-bold text-amber-900 bg-amber-300 px-2 py-0.5 rounded-full shadow-xs' : 
         'text-[10px] uppercase font-bold text-amber-800 bg-amber-100/70 px-2 py-0.5 rounded-full border border-amber-200';
-      document.getElementById('gachaCategory').innerText = isItem ? result.category : '安慰獎';
-      document.getElementById('gachaStatus').innerText = isItem ? '已收進展示架' : '微笑放過自己';
+      
+      document.getElementById('gachaCategory').innerText = isItem ? result.category : '銘謝惠顧';
+      document.getElementById('gachaStatus').innerText = isItem ? (isDuplicate ? '已重複解鎖，回饋 1 🪙' : '新模型！已放入展示架') : '微笑收下這張小紙條';
 
       document.getElementById('gachaModal').classList.remove('hidden');
     }
@@ -600,11 +632,11 @@
       container.innerHTML = COLLECTIBLE_ITEMS.map(item => {
         const unlocked = showcase.includes(item.id);
         return `
-          <div class="p-3 rounded-2xl border ${unlocked ? 'bg-white border-amber-200 shadow-2xs' : 'bg-slate-100/60 border-slate-200/50 opacity-50'} flex flex-col justify-between min-h-[96px]">
+          <div class="p-3 rounded-2xl border ${unlocked ? 'bg-white border-amber-200 shadow-2xs' : 'bg-slate-100/50 border-slate-200/60 opacity-45'} flex flex-col justify-between min-h-[110px]">
             <div>
-              <div class="text-2xl mb-1">${unlocked ? item.icon : '❓'}</div>
-              <h5 class="font-bold text-xs ${unlocked ? 'text-slate-800' : 'text-slate-400'}">${unlocked ? item.name : '未解鎖'}</h5>
-              <p class="text-[10px] text-slate-500 mt-0.5 line-clamp-2">${unlocked ? item.quote : '轉動扭蛋機試試手氣'}</p>
+              <div class="mb-1">${unlocked ? (SVG_LIB[item.svgKey] || '') : '<div class="w-10 h-10 mx-auto rounded-xl bg-slate-200 flex items-center justify-center text-slate-400 font-bold text-xs">?</div>'}</div>
+              <h5 class="font-bold text-xs ${unlocked ? 'text-slate-800' : 'text-slate-400'} text-center mt-1">${unlocked ? item.name : '未解鎖'}</h5>
+              <p class="text-[10px] text-slate-500 mt-1 line-clamp-2 text-center">${unlocked ? item.quote : '轉動扭蛋機試試手氣'}</p>
             </div>
             <div class="mt-2 pt-1 border-t border-slate-100 flex justify-between text-[9px] text-slate-400">
               <span>${item.category}</span>
@@ -615,11 +647,27 @@
       }).join('');
     }
 
-    // --- COIN REWARDS ---
+    // --- COIN REWARDS WITH DAILY CAP ---
     function addCoins(amount) {
-      settings.coins = (settings.coins || 0) + amount;
+      if (amount > 0) {
+        // Enforce daily cap
+        const remainingCap = DAILY_COIN_CAP - (dailyCoinsData.earned || 0);
+        if (remainingCap <= 0) {
+          // Exceeded daily cap
+          alert(`今日已達代幣賺取上限 (${DAILY_COIN_CAP} 🪙)，明日重置後可繼續累積！紀錄仍會正常保存。`);
+          return;
+        }
+        const actualEarn = Math.min(amount, remainingCap);
+        dailyCoinsData.earned += actualEarn;
+        localStorage.setItem(KEY_DAILY_COINS, JSON.stringify(dailyCoinsData));
+        settings.coins = (settings.coins || 0) + actualEarn;
+      } else {
+        // Spending coins
+        settings.coins = Math.max(0, (settings.coins || 0) + amount);
+      }
       localStorage.setItem(KEY_SETTINGS, JSON.stringify(settings));
       document.getElementById('coinDisplay').innerText = settings.coins;
+      document.getElementById('dailyCoinStatus').innerText = `今日已賺 ${dailyCoinsData.earned} / ${DAILY_COIN_CAP} 🪙 (每扭需 4 🪙)`;
     }
 
     // --- MEALS HANDLING ---
@@ -654,7 +702,7 @@
       document.getElementById('mealPhotoInput').value = '';
       document.getElementById('imagePreviewContainer').classList.add('hidden');
       document.getElementById('btnAnalyzeAI').classList.add('hidden');
-      document.getElementById('photoLabel').innerText = "拍照或選擇照片";
+      document.getElementById('photoLabel').innerText = "選取或拍攝照片";
     }
 
     async function analyzeFoodWithAI() {
@@ -793,7 +841,7 @@
     function renderWorkoutList() {
       const container = document.getElementById('workoutListContainer');
       if (workouts.length === 0) {
-        container.innerHTML = `<div class="p-4 bg-white rounded-xl text-center text-slate-400 text-xs border border-slate-100">尚無運動紀錄，出門動一動或在走路機散散步吧！</div>`;
+        container.innerHTML = `<div class="p-4 bg-white rounded-xl text-center text-slate-400 text-xs border border-slate-100">尚無運動紀錄，出門動一動或在走路機散步吧！</div>`;
         return;
       }
       container.innerHTML = workouts.map(w => `
@@ -950,14 +998,14 @@
       document.getElementById('todayWorkout').innerText = totalWorkoutMins;
       document.getElementById('latestWeight').innerText = latestBody ? latestBody.weight : '--';
 
-      // Update lucky buff badge
+      // Update lucky buff badge (2-Month balance)
       const isBuffed = (totalProt >= 80) || (totalWorkoutMins > 0);
       const buffEl = document.getElementById('buffLabel');
       if (isBuffed) {
-        buffEl.innerText = '⚡ 幸運機率提升中';
+        buffEl.innerText = '⚡ 幸運加成中 (45%)';
         buffEl.className = 'text-[10px] font-bold text-emerald-800 bg-emerald-100 px-1.5 py-0.2 rounded border border-emerald-300';
       } else {
-        buffEl.innerText = '常態掉落';
+        buffEl.innerText = '常態掉落 (25%)';
         buffEl.className = 'text-[10px] font-semibold text-amber-700 bg-amber-100/70 px-1.5 py-0.2 rounded';
       }
     }
@@ -1011,7 +1059,7 @@
     }
 
     function exportBackupJSON() {
-      const data = { meals, workouts, bodyLogs, settings, showcase };
+      const data = { meals, workouts, bodyLogs, settings, showcase, dailyCoinsData };
       const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
@@ -1034,11 +1082,13 @@
           if (d.bodyLogs) bodyLogs = d.bodyLogs;
           if (d.settings) settings = d.settings;
           if (d.showcase) showcase = d.showcase;
+          if (d.dailyCoinsData) dailyCoinsData = d.dailyCoinsData;
           localStorage.setItem(KEY_MEALS, JSON.stringify(meals));
           localStorage.setItem(KEY_WORKOUTS, JSON.stringify(workouts));
           localStorage.setItem(KEY_BODY, JSON.stringify(bodyLogs));
           localStorage.setItem(KEY_SETTINGS, JSON.stringify(settings));
           localStorage.setItem(KEY_SHOWCASE, JSON.stringify(showcase));
+          localStorage.setItem(KEY_DAILY_COINS, JSON.stringify(dailyCoinsData));
           location.reload();
         } catch (err) {
           alert('備份解析失敗，請確認檔案格式。');
