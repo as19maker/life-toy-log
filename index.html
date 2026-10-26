@@ -27,9 +27,119 @@
     .modal-pop {
       animation: popCard 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
+  
+    /* 1. Gacha Ball Drop & Cracking */
+    @keyframes dropBounce {
+      0% { transform: translateY(-40px) scale(0.6) rotate(0deg); opacity: 0; }
+      50% { transform: translateY(12px) scale(1.1) rotate(180deg); opacity: 1; }
+      75% { transform: translateY(-6px) scale(0.95) rotate(270deg); }
+      100% { transform: translateY(0px) scale(1) rotate(360deg); opacity: 1; }
+    }
+    .ball-roll-bounce {
+      animation: dropBounce 0.65s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
+    @keyframes paperFlutter {
+      0% { transform: translateY(-20px) rotate(-8deg) scale(0.85); opacity: 0; }
+      30% { transform: translateY(0px) rotate(6deg) scale(1.02); opacity: 1; }
+      60% { transform: translateY(6px) rotate(-3deg); }
+      100% { transform: translateY(0px) rotate(0deg) scale(1); opacity: 1; }
+    }
+    .paper-flutter-anim {
+      animation: paperFlutter 0.6s cubic-bezier(0.2, 0.8, 0.4, 1) forwards;
+    }
+
+    /* 2. Character Poke & Speech Bubble */
+    @keyframes pokeBounce {
+      0% { transform: scale(1) rotate(0deg); }
+      30% { transform: scale(0.92) rotate(-4deg); }
+      60% { transform: scale(1.06) rotate(3deg); }
+      80% { transform: scale(0.98) rotate(-1deg); }
+      100% { transform: scale(1) rotate(0deg); }
+    }
+    .avatar-poke {
+      animation: pokeBounce 0.45s ease-out;
+    }
+    @keyframes bubblePop {
+      0% { transform: translateY(10px) scale(0.7); opacity: 0; }
+      70% { transform: translateY(-2px) scale(1.05); opacity: 1; }
+      100% { transform: translateY(0px) scale(1); opacity: 1; }
+    }
+    .speech-bubble-pop {
+      animation: bubblePop 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28) forwards;
+    }
+
+    /* 3. Earth-tone Confetti Canvas */
+    #confettiCanvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    /* 4. Avatar Drop & Settle Transition + Shadow Puff */
+    @keyframes dropAndSettle {
+      0% { transform: translateY(-18px) scale(0.95); opacity: 0.6; }
+      65% { transform: translateY(4px) scale(1.03); opacity: 1; }
+      85% { transform: translateY(-2px) scale(0.99); }
+      100% { transform: translateY(0px) scale(1); opacity: 1; }
+    }
+    .avatar-drop-settle {
+      animation: dropAndSettle 0.5s cubic-bezier(0.34, 1.4, 0.64, 1) forwards;
+    }
+    @keyframes shadowPuff {
+      0% { transform: scale(0.7); opacity: 0.2; }
+      65% { transform: scale(1.25); opacity: 0.55; }
+      100% { transform: scale(1); opacity: 0.4; }
+    }
+    .shadow-puff {
+      animation: shadowPuff 0.5s ease-out;
+    }
+
+    /* 5. Coin Float-Up & Pulse */
+    @keyframes floatUpFade {
+      0% { transform: translateY(0px) scale(0.8); opacity: 1; }
+      50% { transform: translateY(-24px) scale(1.15); opacity: 1; }
+      100% { transform: translateY(-44px) scale(1); opacity: 0; }
+    }
+    .coin-float-badge {
+      animation: floatUpFade 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+      pointer-events: none;
+    }
+    @keyframes coinPulse {
+      0% { transform: scale(1); }
+      40% { transform: scale(1.22); }
+      70% { transform: scale(0.95); }
+      100% { transform: scale(1); }
+    }
+    .coin-pulse-anim {
+      animation: coinPulse 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    /* 6. Showcase Shimmer Glow & Toy Wiggle */
+    @keyframes shimmerGlow {
+      0% { box-shadow: 0 0 0px rgba(245, 158, 11, 0); border-color: #FCD34D; }
+      50% { box-shadow: 0 0 16px rgba(245, 158, 11, 0.45); border-color: #F59E0B; transform: translateY(-2px); }
+      100% { box-shadow: 0 0 0px rgba(245, 158, 11, 0); border-color: #FCD34D; transform: translateY(0); }
+    }
+    .shimmer-glow {
+      animation: shimmerGlow 1.6s ease-in-out infinite;
+    }
+    @keyframes toyWiggle {
+      0%, 100% { transform: rotate(0deg); }
+      25% { transform: rotate(-6deg); }
+      75% { transform: rotate(6deg); }
+    }
+    .toy-wiggle-anim {
+      animation: toyWiggle 0.6s ease-in-out;
+    }
+
   </style>
 </head>
 <body class="text-slate-800 antialiased min-h-screen pb-24">
+  <canvas id="confettiCanvas"></canvas>
 
   <!-- Header -->
   <header class="sticky top-0 z-40 bg-white/95 backdrop-blur border-b border-slate-200">
@@ -47,7 +157,7 @@
         </div>
       </div>
       <div class="flex items-center gap-2">
-        <div class="flex items-center gap-1 bg-amber-50 border border-amber-200 px-2.5 py-0.5 rounded-full text-xs font-bold text-amber-700">
+        <div id="topCoinBadge" class="flex items-center gap-1 bg-amber-50 border border-amber-200 px-2.5 py-0.5 rounded-full text-xs font-bold text-amber-700 transition-transform">
           <span class="text-amber-500 font-extrabold">🪙</span>
           <span id="coinDisplay">0</span>
         </div>
@@ -70,14 +180,20 @@
         
                 <!-- Left: Adaptive 3D Character Stage -->
         <div class="relative w-44 h-64 flex-shrink-0 flex flex-col items-center justify-end">
+          <!-- Interactive Speech Bubble -->
+          <div id="avatarSpeechBubble" class="hidden absolute -top-8 left-1/2 transform -translate-x-1/2 z-30 bg-slate-900/90 text-white text-[11px] font-bold px-3 py-1 rounded-2xl shadow-lg whitespace-nowrap pointer-events-none flex items-center gap-1 border border-slate-700/80">
+            <span id="avatarSpeechText">今天歐包烤得好脆！🥖</span>
+            <div class="absolute -bottom-1.5 left-1/2 transform -translate-x-1/2 w-0 h-0 border-x-4 border-x-transparent border-t-4 border-t-slate-900/90"></div>
+          </div>
+
           <!-- Ambient spotlight glow -->
           <div class="absolute inset-0 bg-radial from-amber-100/70 via-transparent to-transparent rounded-full filter blur-xl pointer-events-none"></div>
           
           <!-- Character Stand / Pedestal -->
-          <div class="absolute bottom-1 w-40 h-6 bg-slate-900/10 rounded-full filter blur-sm"></div>
+          <div id="avatarStandShadow" class="absolute bottom-1 w-40 h-6 bg-slate-900/10 rounded-full filter blur-sm transition-all duration-500"></div>
           
-          <!-- Dynamic 3D Character Image -->
-          <div class="relative z-10 w-40 h-56 flex items-center justify-center transition-all duration-300">
+          <!-- Dynamic 3D Character Image (Tap to Poke!) -->
+          <div class="relative z-10 w-40 h-56 flex items-center justify-center transition-all duration-300 cursor-pointer" onclick="pokeAvatar()" title="戳我一下，聽聽碎碎念">
             <img id="avatarImg" src="data:image/webp;base64,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" alt="我的生活公仔" class="w-full h-full object-contain filter drop-shadow-md select-none transition-all duration-500">
           </div>
 
@@ -106,7 +222,7 @@
             </div>
 
             <!-- Gacha Crank Action Button -->
-            <button onclick="playGacha()" class="px-4 py-3 bg-slate-900 hover:bg-slate-800 active:scale-95 text-white font-bold text-xs rounded-2xl shadow transition flex flex-col items-center gap-0.5 shrink-0">
+            <button onclick="playGachaAnimated()" class="px-4 py-3 bg-slate-900 hover:bg-slate-800 active:scale-95 text-white font-bold text-xs rounded-2xl shadow transition flex flex-col items-center gap-0.5 shrink-0">
               <span class="flex items-center gap-1">
                 <span class="text-xs">⟳</span>
                 <span>轉動扭蛋</span>
@@ -174,8 +290,12 @@
               <span class="font-bold text-slate-800 text-xs" id="todayWorkout">0</span> <span class="text-[9px] text-slate-400">分</span>
             </div>
             <div class="bg-white p-2 rounded-xl border border-slate-100 shadow-2xs">
-              <span class="text-[10px] text-slate-400 block">最新體重</span>
-              <span class="font-bold text-emerald-600 text-xs" id="latestWeight">--</span> <span class="text-[9px] text-slate-400">kg</span>
+              <span class="text-[10px] text-slate-400 block">最新體態</span>
+              <div class="flex items-baseline justify-center gap-0.5">
+                <span class="font-bold text-emerald-600 text-xs" id="latestWeight">--</span><span class="text-[9px] text-slate-400">kg</span>
+                <span class="text-slate-300 text-[10px] mx-0.5">/</span>
+                <span class="font-bold text-amber-600 text-xs" id="latestWaist">--</span><span class="text-[9px] text-slate-400">cm</span>
+              </div>
             </div>
           </div>
 
@@ -345,24 +465,24 @@
           <span class="text-[11px] text-amber-600 font-semibold">+1 🪙</span>
         </h3>
 
-        <form id="bodyForm" onsubmit="handleBodySubmit(event)" class="grid grid-cols-3 gap-2 items-end">
+        <form id="bodyForm" onsubmit="handleBodySubmit(event)" class="space-y-3">
           <div>
             <label class="block text-[11px] font-medium text-slate-600 mb-1">打卡日期</label>
-            <input type="date" id="bodyDate" required class="w-full text-xs bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-2">
+            <input type="date" id="bodyDate" required class="w-full text-xs bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-slate-400">
           </div>
-          <div>
-            <label class="block text-[11px] font-medium text-slate-600 mb-1">體重 (kg)</label>
-            <input type="number" step="0.1" id="bodyWeight" placeholder="75.0" required class="w-full text-xs bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-2">
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-[11px] font-medium text-slate-600 mb-1">體重 (kg)</label>
+              <input type="number" step="0.1" id="bodyWeight" placeholder="75.0" required class="w-full text-xs bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-slate-400">
+            </div>
+            <div>
+              <label class="block text-[11px] font-medium text-slate-600 mb-1">腰圍 (cm)</label>
+              <input type="number" step="0.1" id="bodyWaist" placeholder="82.0" class="w-full text-xs bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-slate-400">
+            </div>
           </div>
-          <div>
-            <label class="block text-[11px] font-medium text-slate-600 mb-1">腰圍 (cm)</label>
-            <input type="number" step="0.1" id="bodyWaist" placeholder="82.0" class="w-full text-xs bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-2">
-          </div>
-          <div class="col-span-3 mt-1">
-            <button type="submit" class="w-full py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-xl shadow-xs">
-              儲存體態紀錄
-            </button>
-          </div>
+          <button type="submit" class="w-full py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-xl shadow-xs transition active:scale-98">
+            儲存體態紀錄
+          </button>
         </form>
       </section>
 
@@ -574,8 +694,11 @@
     document.addEventListener('DOMContentLoaded', () => {
       initDateInputs();
       renderDashboard();
+      const latestP = meals.filter(m => (m.datetime || '').startsWith(todayStr)).reduce((a,m)=>a+(m.protein||0), 0);
+      if (latestP >= (settings.protTarget || 100)) triggerEarthConfetti();
       renderMealList();
       renderWorkoutList();
+      triggerEarthConfetti();
       renderBodyTable();
       renderShowcase();
       initChart();
@@ -610,10 +733,18 @@
         }
       });
       if (tab === 'body') updateChart();
+      triggerEarthConfetti();
     }
 
-    // --- GACHA CORE (2-MONTH CYCLE REBALANCED) ---
-    function playGacha() {
+    // --- GACHA CORE (ANIMATED & REBALANCED) ---
+    
+    // ==========================================
+    // 6 CUTE MICRO-INTERACTIONS & ANIMATIONS
+    // ==========================================
+
+    // --- 1. GACHA BALL DROP & CRACK SEQUENCE ---
+    // In playGacha(), we play lever spin -> drop a bouncing ball -> ball pops open -> show modal
+    function playGachaAnimated() {
       if ((settings.coins || 0) < COST_PER_GACHA) {
         alert(`🪙 扭蛋幣不足！轉動一次需要 ${COST_PER_GACHA} 🪙。請先記錄飲食、體態或運動累積金幣！`);
         return;
@@ -624,9 +755,39 @@
 
       // Crank lever animation
       const lever = document.getElementById('gachaLever');
-      lever.classList.add('spin-active');
-      setTimeout(() => lever.classList.remove('spin-active'), 600);
+      if (lever) {
+        lever.classList.remove('spin-active');
+        void lever.offsetWidth; // trigger reflow
+        lever.classList.add('spin-active');
+      }
 
+      // Animate gacha machine image a tiny bounce
+      const machineImg = document.getElementById('gachaMachineImg');
+      if (machineImg) {
+        machineImg.style.transform = 'scale(0.96) rotate(-2deg)';
+        setTimeout(() => { machineImg.style.transform = 'scale(1) rotate(0deg)'; }, 350);
+      }
+
+      // Show bouncing ball rolling out
+      const ballContainer = document.getElementById('gachaBallExitContainer');
+      const ballEl = document.getElementById('gachaDropBall');
+      const ballColors = ['bg-rose-500', 'bg-amber-400', 'bg-emerald-500', 'bg-sky-400', 'bg-purple-500'];
+      const randomColor = ballColors[Math.floor(Math.random() * ballColors.length)];
+
+      if (ballContainer && ballEl) {
+        ballContainer.classList.remove('hidden');
+        ballEl.className = `w-7 h-7 rounded-full shadow-md border-2 border-white ball-roll-bounce flex items-center justify-center text-[10px] text-white font-bold ${randomColor}`;
+        ballEl.innerText = '★';
+      }
+
+      // After 650ms ball drops and cracks open
+      setTimeout(() => {
+        executeGachaLogic();
+        if (ballContainer) ballContainer.classList.add('hidden');
+      }, 700);
+    }
+
+    function executeGachaLogic() {
       // Check Lucky Buff today
       const todayPrefix = new Date().toISOString().slice(0, 10);
       const todayMeals = meals.filter(m => (m.datetime || '').startsWith(todayPrefix));
@@ -643,6 +804,7 @@
       let result = null;
       let isItem = false;
       let isDuplicate = false;
+      let isBrandNew = false;
 
       if (roll < emptyChance) {
         // Drop an empty shell / funny note
@@ -657,22 +819,44 @@
           // Duplicate reward: refund 1 coin
           addCoins(1);
         } else {
+          isBrandNew = true;
           showcase.push(result.id);
           localStorage.setItem(KEY_SHOWCASE, JSON.stringify(showcase));
-          renderShowcase();
+          renderShowcase(result.id); // pass newly unlocked id for shimmer
+          triggerEarthConfetti(); // Paper confetti on new unlock!
         }
       }
 
       // Render Modal with Vector Illustration
-      document.getElementById('gachaRevealIcon').innerHTML = SVG_LIB[result.svgKey] || '';
+      const iconContainer = document.getElementById('gachaRevealIcon');
+      iconContainer.innerHTML = SVG_LIB[result.svgKey] || '';
+      
+      // If paper note, add flutter animation; if item, add pop
+      if (!isItem) {
+        iconContainer.className = 'w-24 h-24 mx-auto rounded-3xl bg-slate-50 flex items-center justify-center p-2 shadow-inner paper-flutter-anim';
+      } else {
+        iconContainer.className = 'w-24 h-24 mx-auto rounded-3xl bg-amber-50 flex items-center justify-center p-2 shadow-inner toy-wiggle-anim';
+      }
+
       document.getElementById('gachaCardTitle').innerText = result.name;
       document.getElementById('gachaCardQuote').innerText = `「${result.quote}」`;
       
       const tag = document.getElementById('gachaRarityTag');
-      tag.innerText = isItem ? (isDuplicate ? `${result.rarity}・重複款 (+1🪙)` : result.rarity) : '幽默小籤';
-      tag.className = isItem && result.rarity === '傳奇' ? 
-        'text-[10px] uppercase font-bold text-amber-900 bg-amber-300 px-2 py-0.5 rounded-full shadow-xs' : 
-        'text-[10px] uppercase font-bold text-amber-800 bg-amber-100/70 px-2 py-0.5 rounded-full border border-amber-200';
+      if (isItem) {
+        if (isBrandNew) {
+          tag.innerText = `✨ NEW! ${result.rarity}`;
+          tag.className = 'text-[10px] uppercase font-bold text-amber-900 bg-amber-300 px-2.5 py-0.5 rounded-full shadow-xs animate-bounce';
+        } else if (isDuplicate) {
+          tag.innerText = `${result.rarity}・重複款 (+1🪙 回饋)`;
+          tag.className = 'text-[10px] uppercase font-bold text-slate-700 bg-slate-200 px-2 py-0.5 rounded-full';
+        } else {
+          tag.innerText = result.rarity;
+          tag.className = 'text-[10px] uppercase font-bold text-amber-800 bg-amber-100/70 px-2 py-0.5 rounded-full border border-amber-200';
+        }
+      } else {
+        tag.innerText = '幽默小籤';
+        tag.className = 'text-[10px] uppercase font-bold text-slate-600 bg-slate-100 px-2 py-0.5 rounded-full border border-slate-200';
+      }
       
       document.getElementById('gachaCategory').innerText = isItem ? result.category : '銘謝惠顧';
       document.getElementById('gachaStatus').innerText = isItem ? (isDuplicate ? '已重複解鎖，回饋 1 🪙' : '新模型！已放入展示架') : '微笑收下這張小紙條';
@@ -680,11 +864,151 @@
       document.getElementById('gachaModal').classList.remove('hidden');
     }
 
+    // --- 2. AVATAR POKE INTERACTION & RANDOM LIFE BUBBLES ---
+    const AVATAR_QUOTES = [
+      "今天歐包烤得好脆！🥖",
+      "滑板重心有放低嗎？🛹",
+      "腰間的鈕扣今天還撐得住！🔘",
+      "好好吃，代謝自然會有好節奏 ☕",
+      "摸摸貓咪，充電完畢！🐾",
+      "多喝水，代謝才會順暢喔 🧊",
+      "今天推蹬核心收得很扎實！🏋️",
+      "一步一步來，微小的進步都在累積 🍃",
+      "休息也是自律的一部分，今天放鬆過生活 :)"
+    ];
+
+    let pokeBubbleTimeout = null;
+    function pokeAvatar() {
+      const avatarImg = document.getElementById('avatarImg');
+      const bubble = document.getElementById('avatarSpeechBubble');
+      const bubbleText = document.getElementById('avatarSpeechText');
+      if (!avatarImg || !bubble) return;
+
+      // Play poke bounce
+      avatarImg.classList.remove('avatar-poke');
+      void avatarImg.offsetWidth; // reflow
+      avatarImg.classList.add('avatar-poke');
+
+      // Pick random quote
+      const q = AVATAR_QUOTES[Math.floor(Math.random() * AVATAR_QUOTES.length)];
+      bubbleText.innerText = q;
+
+      bubble.classList.remove('hidden');
+      bubble.classList.remove('speech-bubble-pop');
+      void bubble.offsetWidth;
+      bubble.classList.add('speech-bubble-pop');
+
+      if (pokeBubbleTimeout) clearTimeout(pokeBubbleTimeout);
+      pokeBubbleTimeout = setTimeout(() => {
+        bubble.classList.add('hidden');
+      }, 2400);
+    }
+
+    // --- 3. EARTH-TONE CONFETTI BURST ---
+    function triggerEarthConfetti() {
+      const canvas = document.getElementById('confettiCanvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+
+      const colors = ['#A3B18A', '#588157', '#3A5A40', '#D4A373', '#FAEDCD', '#E9D8A6', '#CA6702', '#2A9D8F'];
+      const particles = [];
+      const particleCount = 45;
+
+      for (let i = 0; i < particleCount; i++) {
+        particles.push({
+          x: canvas.width * 0.5 + (Math.random() - 0.5) * 80,
+          y: canvas.height * 0.4 + (Math.random() - 0.5) * 50,
+          vx: (Math.random() - 0.5) * 12,
+          vy: Math.random() * -10 - 4,
+          size: Math.random() * 8 + 5,
+          color: colors[Math.floor(Math.random() * colors.length)],
+          rotation: Math.random() * 360,
+          vRot: (Math.random() - 0.5) * 10,
+          alpha: 1
+        });
+      }
+
+      let frame = 0;
+      function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        let alive = false;
+        particles.forEach(p => {
+          p.x += p.vx;
+          p.y += p.vy;
+          p.vy += 0.35; // gravity
+          p.vx *= 0.98; // drag
+          p.rotation += p.vRot;
+          if (frame > 25) p.alpha -= 0.025;
+
+          if (p.alpha > 0) {
+            alive = true;
+            ctx.save();
+            ctx.globalAlpha = Math.max(0, p.alpha);
+            ctx.translate(p.x, p.y);
+            ctx.rotate((p.rotation * Math.PI) / 180);
+            ctx.fillStyle = p.color;
+            ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 0.6);
+            ctx.restore();
+          }
+        });
+
+        frame++;
+        if (alive && frame < 90) {
+          requestAnimationFrame(animate);
+        } else {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+      }
+      requestAnimationFrame(animate);
+    }
+
+    // --- 4. AVATAR DROP & SETTLE ANIMATION ---
+    function playAvatarTransition(avatarKey) {
+      const avatarImg = document.getElementById('avatarImg');
+      const shadow = document.getElementById('avatarStandShadow');
+      if (avatarImg) {
+        avatarImg.classList.remove('avatar-drop-settle');
+        void avatarImg.offsetWidth;
+        avatarImg.classList.add('avatar-drop-settle');
+      }
+      if (shadow) {
+        shadow.classList.remove('shadow-puff');
+        void shadow.offsetWidth;
+        shadow.classList.add('shadow-puff');
+      }
+    }
+
+    // --- 5. COIN FLOAT-UP & HEADER PULSE ---
+    function floatCoinReward(amount) {
+      if (amount <= 0) return;
+      // Pulse top coin badge
+      const badge = document.getElementById('topCoinBadge');
+      if (badge) {
+        badge.classList.remove('coin-pulse-anim');
+        void badge.offsetWidth;
+        badge.classList.add('coin-pulse-anim');
+      }
+
+      // Create floating element
+      const floater = document.createElement('div');
+      floater.className = 'fixed z-50 pointer-events-none text-xs font-black text-amber-800 bg-amber-100 border border-amber-300 px-2 py-0.5 rounded-full shadow-md coin-float-badge';
+      floater.style.top = '65px';
+      floater.style.right = '70px';
+      floater.innerText = `+${amount} 🪙`;
+      document.body.appendChild(floater);
+      setTimeout(() => {
+        if (floater.parentNode) floater.parentNode.removeChild(floater);
+      }, 950);
+    }
+
+
     function closeGachaModal() {
       document.getElementById('gachaModal').classList.add('hidden');
     }
 
-    function renderShowcase() {
+    function renderShowcase(highlightId) {
       const container = document.getElementById('showcaseGrid');
       const ratio = `${showcase.length} / ${COLLECTIBLE_ITEMS.length}`;
       document.getElementById('collectionRatio').innerText = ratio;
@@ -695,8 +1019,9 @@
 
       container.innerHTML = COLLECTIBLE_ITEMS.map(item => {
         const unlocked = showcase.includes(item.id);
+        const isHighlight = (typeof highlightId !== 'undefined' && highlightId === item.id);
         return `
-          <div class="p-3 rounded-2xl border ${unlocked ? 'bg-white border-amber-200 shadow-2xs' : 'bg-slate-100/50 border-slate-200/60 opacity-45'} flex flex-col justify-between min-h-[140px]">
+          <div class="p-3 rounded-2xl border ${unlocked ? (isHighlight ? 'bg-amber-50/70 border-amber-400 shadow-md shimmer-glow' : 'bg-white border-amber-200 shadow-2xs') : 'bg-slate-100/50 border-slate-200/60 opacity-45'} flex flex-col justify-between min-h-[140px] transition-all">
             <div>
               <div class="mb-1">${unlocked ? (SVG_LIB[item.svgKey] || '') : '<div class="w-10 h-10 mx-auto rounded-xl bg-slate-200 flex items-center justify-center text-slate-400 font-bold text-xs">?</div>'}</div>
               <h5 class="font-bold text-xs ${unlocked ? 'text-slate-800' : 'text-slate-400'} text-center mt-1">${unlocked ? item.name : '未解鎖'}</h5>
@@ -725,6 +1050,7 @@
         dailyCoinsData.earned += actualEarn;
         localStorage.setItem(KEY_DAILY_COINS, JSON.stringify(dailyCoinsData));
         settings.coins = (settings.coins || 0) + actualEarn;
+        floatCoinReward(actualEarn);
       } else {
         // Spending coins
         settings.coins = Math.max(0, (settings.coins || 0) + amount);
@@ -834,6 +1160,8 @@
       clearPhoto();
       initDateInputs();
       renderDashboard();
+      const latestP = meals.filter(m => (m.datetime || '').startsWith(todayStr)).reduce((a,m)=>a+(m.protein||0), 0);
+      if (latestP >= (settings.protTarget || 100)) triggerEarthConfetti();
       renderMealList();
     }
 
@@ -842,6 +1170,8 @@
       meals = meals.filter(m => m.id !== id);
       localStorage.setItem(KEY_MEALS, JSON.stringify(meals));
       renderDashboard();
+      const latestP = meals.filter(m => (m.datetime || '').startsWith(todayStr)).reduce((a,m)=>a+(m.protein||0), 0);
+      if (latestP >= (settings.protTarget || 100)) triggerEarthConfetti();
       renderMealList();
     }
 
@@ -891,7 +1221,10 @@
       document.getElementById('workoutForm').reset();
       initDateInputs();
       renderDashboard();
+      const latestP = meals.filter(m => (m.datetime || '').startsWith(todayStr)).reduce((a,m)=>a+(m.protein||0), 0);
+      if (latestP >= (settings.protTarget || 100)) triggerEarthConfetti();
       renderWorkoutList();
+      triggerEarthConfetti();
     }
 
     function deleteWorkout(id) {
@@ -899,7 +1232,10 @@
       workouts = workouts.filter(w => w.id !== id);
       localStorage.setItem(KEY_WORKOUTS, JSON.stringify(workouts));
       renderDashboard();
+      const latestP = meals.filter(m => (m.datetime || '').startsWith(todayStr)).reduce((a,m)=>a+(m.protein||0), 0);
+      if (latestP >= (settings.protTarget || 100)) triggerEarthConfetti();
       renderWorkoutList();
+      triggerEarthConfetti();
     }
 
     function renderWorkoutList() {
@@ -950,8 +1286,11 @@
       document.getElementById('bodyWaist').value = '';
 
       renderDashboard();
+      const latestP = meals.filter(m => (m.datetime || '').startsWith(todayStr)).reduce((a,m)=>a+(m.protein||0), 0);
+      if (latestP >= (settings.protTarget || 100)) triggerEarthConfetti();
       renderBodyTable();
       updateChart();
+      triggerEarthConfetti();
     }
 
     function deleteBodyLog(date) {
@@ -959,8 +1298,11 @@
       bodyLogs = bodyLogs.filter(b => b.date !== date);
       localStorage.setItem(KEY_BODY, JSON.stringify(bodyLogs));
       renderDashboard();
+      const latestP = meals.filter(m => (m.datetime || '').startsWith(todayStr)).reduce((a,m)=>a+(m.protein||0), 0);
+      if (latestP >= (settings.protTarget || 100)) triggerEarthConfetti();
       renderBodyTable();
       updateChart();
+      triggerEarthConfetti();
     }
 
     function renderBodyTable() {
@@ -1072,6 +1414,7 @@
 
       if (avatarImg && info) {
         avatarImg.src = CHAR_ASSETS[stageKey];
+        playAvatarTransition(stageKey);
         stateLabel.innerText = info.name;
         if (stateDot) stateDot.className = `w-1.5 h-1.5 rounded-full animate-pulse ${info.dot}`;
       }
@@ -1149,6 +1492,8 @@
       document.getElementById('todayProt').innerText = totalProt;
       document.getElementById('todayWorkout').innerText = totalWorkoutMins;
       document.getElementById('latestWeight').innerText = latestBody ? latestBody.weight : '--';
+      const waistEl = document.getElementById('latestWaist');
+      if (waistEl) waistEl.innerText = (latestBody && latestBody.waist) ? latestBody.waist : '--';
       updateAdaptiveAvatar(latestBody ? latestBody.weight : null);
 
       // Update lucky buff badge (2-Month balance)
@@ -1183,6 +1528,8 @@
 
       closeSettingsModal();
       renderDashboard();
+      const latestP = meals.filter(m => (m.datetime || '').startsWith(todayStr)).reduce((a,m)=>a+(m.protein||0), 0);
+      if (latestP >= (settings.protTarget || 100)) triggerEarthConfetti();
       alert('設定已儲存！');
     }
 
